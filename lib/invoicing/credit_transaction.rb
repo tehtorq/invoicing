@@ -1,7 +1,7 @@
 module Invoicing
   class CreditTransaction < Transaction
     
-    def debit?
+    def credit?
       true
     end
   
