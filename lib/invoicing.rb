@@ -18,3 +18,4 @@ require "invoicing/late_payment"
 require "invoicing/line_item"
 
 require "invoicing/invoice"
+require "invoicing/overdue_invoice"

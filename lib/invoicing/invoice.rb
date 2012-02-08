@@ -6,8 +6,6 @@ module Invoicing
   
     before_save :calculate_totals, :calculate_balance
     after_create :create_transactions
-    #   
-    #scope :owing, where("balance < ?", 0)
     
     def calculate_totals
       self.total = line_items.inject(0) {|res, item| res + item.amount.to_f}
@@ -45,6 +43,10 @@ module Invoicing
       
     def overdue?
       owing? and due_date_past?
+    end
+    
+    def self.owing
+      where("balance < ?", 0)
     end
   
   end
