@@ -5,10 +5,18 @@ module Invoicing
     has_one :late_payment
   
     before_save :calculate_totals, :calculate_balance
-    after_create :create_transactions
+    after_create :create_initial_transaction!
     
     def add_line_item(params)
       self.line_items << LineItem.new(params)
+    end
+    
+    def add_debit_transaction(params)
+      self.transactions << DebitTransaction.new(params)
+    end
+    
+    def add_credit_transaction(params)
+      self.transactions << CreditTransaction.new(params)
     end
     
     def calculate_totals
@@ -16,9 +24,14 @@ module Invoicing
       self.vat_amount = 0 # fix
     end
       
-    def create_transactions
-      self.transactions << DebitTransaction.new(amount: total)
-      self.save!
+    def create_initial_transaction!
+      if total < 0
+        add_credit_transaction amount: total
+      else
+        add_debit_transaction amount: total
+      end
+
+      save!
     end
       
     def debit_transactions

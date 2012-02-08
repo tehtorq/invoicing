@@ -31,7 +31,7 @@ describe Invoicing::Invoice do
   
   it "should create a debit transaction with an amount matching the sum of its line item amounts" do
     @invoice.transactions.length.should == 1
-    @invoice.transactions.first.is_a? Invoicing::DebitTransaction
+    @invoice.transactions.first.debit?
     @invoice.transactions.first.amount.should == 282.12
   end
   
@@ -43,7 +43,7 @@ describe Invoicing::Invoice do
     @invoice.balance.should_not be_zero
     @invoice.settled?.should be_false
     
-    @invoice.transactions << Invoicing::CreditTransaction.new(amount: 282.12)
+    @invoice.add_credit_transaction amount: 282.12
     @invoice.save!
     
     @invoice.balance.should be_zero
@@ -58,7 +58,7 @@ describe Invoicing::Invoice do
   end
   
   it "should not report as overdue if the invoice has been settled" do
-    @invoice.transactions << Invoicing::CreditTransaction.new(amount: 282.12)
+    @invoice.add_credit_transaction amount: 282.12
     @invoice.due_date = Date.today - 1.days
     @invoice.save!
     
