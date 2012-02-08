@@ -4,7 +4,6 @@ source "http://rubygems.org"
 gemspec
 
 group :development do
-  gem 'mysql2'
   gem 'rspec'
   gem 'rspec-rails'
   gem 'sqlite3'

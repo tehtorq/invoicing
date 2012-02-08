@@ -2,5 +2,5 @@
 .bundle
 Gemfile.lock
 pkg/*
-spec/internal/db/invoicing_test.sqlite
+spec/internal/db/*.sqlite
 spec/internal/config/database.yml

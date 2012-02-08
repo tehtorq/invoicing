@@ -11,9 +11,10 @@ module Invoicing
   
 end
 
-require "invoicing/invoice"
+require "invoicing/transaction"
 require "invoicing/credit_transaction"
 require "invoicing/debit_transaction"
 require "invoicing/late_payment"
 require "invoicing/line_item"
-require "invoicing/transaction"
+
+require "invoicing/invoice"
