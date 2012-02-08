@@ -5,8 +5,8 @@ require "invoicing/version"
 Gem::Specification.new do |s|
   s.name        = "invoicing"
   s.version     = Invoicing::VERSION
-  s.authors     = []
-  s.email       = []
+  s.authors     = ["Douglas Anderson", "Jeffrey van Aswegen", ]
+  s.email       = ["i.am.douglas.anderson@gmail.com", "jeffmess@gmail.com"]
   s.homepage    = ""
   s.summary     = %q{ An invoicing gem. }
   s.description = %q{ Manage invoices. }
