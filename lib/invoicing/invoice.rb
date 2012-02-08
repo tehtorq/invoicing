@@ -7,6 +7,10 @@ module Invoicing
     before_save :calculate_totals, :calculate_balance
     after_create :create_transactions
     
+    def add_line_item(params)
+      self.line_items << LineItem.new(params)
+    end
+    
     def calculate_totals
       self.total = line_items.inject(0) {|res, item| res + item.amount.to_f}
       self.vat_amount = 0 # fix

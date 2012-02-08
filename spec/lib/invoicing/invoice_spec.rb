@@ -7,11 +7,22 @@ describe Invoicing::Invoice do
     tear_it_down
     
     @invoice = Invoicing::Invoice.new
-    @invoice.line_items << Invoicing::LineItem.new(description: "Line Item 1", amount: 11.01)
-    @invoice.line_items << Invoicing::LineItem.new(description: "Line Item 2", amount: 50.97)
-    @invoice.line_items << Invoicing::LineItem.new(description: "Line Item 3", amount: 17.14)
-    @invoice.line_items << Invoicing::LineItem.new(description: "Line Item 4", amount: 203)
+    @invoice.add_line_item description: "Line Item 1", amount: 11.01
+    @invoice.add_line_item description: "Line Item 2", amount: 50.97
+    @invoice.add_line_item description: "Line Item 3", amount: 17.14
+    @invoice.add_line_item description: "Line Item 4", amount: 203
     @invoice.save!
+  end
+  
+  it "should be able to add a line item" do
+    invoice = Invoicing::Invoice.new
+    invoice.add_line_item description: "Line Item 1", amount: 11.01
+    invoice.save!
+    
+    line_items = invoice.line_items
+    line_items.count.should == 1
+    line_items.first.amount.should == 11.01
+    line_items.first.description.should == "Line Item 1"
   end
   
   it "should have a total matching the sum of its line item amounts" do
@@ -56,7 +67,7 @@ describe Invoicing::Invoice do
   
   it "should find all invoices which are owing" do
     invoice = Invoicing::Invoice.new
-    invoice.line_items << Invoicing::LineItem.new(description: "Line Item 1", amount: 11.01)
+    invoice.add_line_item description: "Line Item 1", amount: 11.01
     invoice.save!
     
     Invoicing::Invoice.owing.count.should == 2    
