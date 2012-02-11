@@ -40,6 +40,7 @@ describe Invoicing::OverdueInvoice do
     
     Invoicing::LatePayment.count.should == 1
     Invoicing::LatePayment.first.invoice.should == invoice2
+    Invoicing::LatePayment.first.amount.should == 11.01
     invoice2.late_payment.should == Invoicing::LatePayment.first
   end
   

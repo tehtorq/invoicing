@@ -7,7 +7,7 @@ module Invoicing
   
     def self.record_late_payments!
       OverdueInvoice.all.each do |invoice|
-        invoice.late_payment = LatePayment.new
+        invoice.late_payment = LatePayment.new amount: invoice.balance.abs
         invoice.save!
       end
     end

@@ -2,6 +2,7 @@ ActiveRecord::Schema.define do
   
   create_table "invoicing_late_payments", :force => true do |t|
     t.integer  "invoice_id"
+    t.float "amount"
     t.datetime "penalty_date"
     t.boolean  "processed"
     t.timestamps
