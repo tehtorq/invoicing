@@ -2,6 +2,7 @@ module Invoicing
   class Invoice < ActiveRecord::Base
     has_many :line_items
     has_many :transactions
+    has_many :payment_references
     has_one :late_payment
   
     before_save :calculate_totals, :calculate_balance
@@ -64,6 +65,14 @@ module Invoicing
     
     def self.owing
       where("balance < ?", 0)
+    end
+    
+    def add_payment_reference(params)
+      self.payment_references << PaymentReference.new(params)
+    end
+    
+    def self.for_payment_reference(reference)
+      PaymentReference.where(reference: reference).map(&:invoice)
     end
   
   end

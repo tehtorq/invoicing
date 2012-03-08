@@ -31,6 +31,12 @@ class CreateInvoicingTables < ActiveRecord::Migration
       t.decimal  "balance", precision: 10, scale: 2
       t.timestamps
     end
+    
+    create_table "invoicing_payment_references", :force => true do |t|
+      t.integer "invoice_id"
+      t.string "reference"
+      t.timestamps
+    end
  
   end
 

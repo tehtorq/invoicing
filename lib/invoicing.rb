@@ -16,6 +16,7 @@ require "invoicing/credit_transaction"
 require "invoicing/debit_transaction"
 require "invoicing/late_payment"
 require "invoicing/line_item"
+require "invoicing/payment_reference"
 
 require "invoicing/invoice"
 require "invoicing/overdue_invoice"

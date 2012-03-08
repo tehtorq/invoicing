@@ -73,4 +73,28 @@ describe Invoicing::Invoice do
     Invoicing::Invoice.owing.count.should == 2    
   end
   
+  it "should be able to register multiple references to look up invoices by" do
+    invoice = Invoicing::Invoice.new
+    invoice.add_payment_reference(reference: "Mr. Anderson")
+    invoice.add_payment_reference(reference: "REF23934")
+    invoice.save!
+    
+    invoice.payment_references.map(&:reference).should == ["Mr. Anderson", "REF23934"]
+  end
+  
+  it "should be able to find invoices for a given reference" do
+    invoice1 = Invoicing::Invoice.new
+    invoice1.add_payment_reference(reference: "Mr. Anderson")
+    invoice1.add_payment_reference(reference: "REF23934")
+    invoice1.save!
+    
+    invoice2 = Invoicing::Invoice.new
+    invoice2.add_payment_reference(reference: "Mr. Anderson")
+    invoice2.save
+    
+    Invoicing::Invoice.for_payment_reference("Mr. Anderson").should == [invoice1, invoice2]
+    Invoicing::Invoice.for_payment_reference("REF23934").should == [invoice1]
+    Invoicing::Invoice.for_payment_reference("My Payment").should == []
+  end
+  
 end

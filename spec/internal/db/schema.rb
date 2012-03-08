@@ -11,7 +11,7 @@ ActiveRecord::Schema.define do
   create_table "invoicing_line_items", :force => true do |t|
     t.integer "invoice_id"
     t.string  "description"
-    t.decimal   "amount", precision: 10, scale: 2
+    t.decimal "amount", precision: 10, scale: 2
     t.timestamps
   end
   
@@ -28,6 +28,12 @@ ActiveRecord::Schema.define do
     t.decimal  "total", precision: 10, scale: 2
     t.decimal  "vat_amount", precision: 10, scale: 2
     t.decimal  "balance", precision: 10, scale: 2
+    t.timestamps
+  end
+  
+  create_table "invoicing_payment_references", :force => true do |t|
+    t.integer "invoice_id"
+    t.string "reference"
     t.timestamps
   end
   
