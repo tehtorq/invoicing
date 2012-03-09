@@ -12,6 +12,8 @@ ActiveRecord::Schema.define do
     t.integer "invoice_id"
     t.string  "description"
     t.decimal "amount", precision: 10, scale: 2
+    t.integer "invoiceable_id"
+    t.string "invoiceable_type"
     t.timestamps
   end
   

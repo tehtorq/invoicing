@@ -97,4 +97,16 @@ describe Invoicing::Invoice do
     Invoicing::Invoice.for_payment_reference("My Payment").should == []
   end
   
+  context "when adding a line item" do
+    
+    it "should be able to attach an invoiceable item to the line item" do
+      invoice = Invoicing::Invoice.new
+      invoice.add_line_item description: "Line Item 1", amount: 11.01, invoiceable: @invoice # yes, we're invoicing an invoice
+      invoice.save!
+      
+      invoice.line_items.first.invoiceable.should == @invoice
+      
+    end
+  end
+  
 end
