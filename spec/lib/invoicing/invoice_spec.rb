@@ -7,43 +7,43 @@ describe Invoicing::Invoice do
     tear_it_down
     
     @invoice = Invoicing::Invoice.new
-    @invoice.add_line_item description: "Line Item 1", amount: 11.01
-    @invoice.add_line_item description: "Line Item 2", amount: 50.97
-    @invoice.add_line_item description: "Line Item 3", amount: 17.14
-    @invoice.add_line_item description: "Line Item 4", amount: 203
+    @invoice.add_line_item description: "Line Item 1", amount: 1101
+    @invoice.add_line_item description: "Line Item 2", amount: 5097
+    @invoice.add_line_item description: "Line Item 3", amount: 1714
+    @invoice.add_line_item description: "Line Item 4", amount: 20300
     @invoice.save!
   end
   
   it "should be able to add a line item" do
     invoice = Invoicing::Invoice.new
-    invoice.add_line_item description: "Line Item 1", amount: 11.01
+    invoice.add_line_item description: "Line Item 1", amount: 1101
     invoice.save!
     
     line_items = invoice.line_items
     line_items.count.should == 1
-    line_items.first.amount.should == 11.01
+    line_items.first.amount.should == 1101
     line_items.first.description.should == "Line Item 1"
   end
   
   it "should have a total matching the sum of its line item amounts" do
-    @invoice.total.should == 282.12
+    @invoice.total.should == 28212
   end
   
   it "should create a debit transaction with an amount matching the sum of its line item amounts" do
     @invoice.transactions.length.should == 1
     @invoice.transactions.first.debit?
-    @invoice.transactions.first.amount.should == 282.12
+    @invoice.transactions.first.amount.should == 28212
   end
   
   it "should be able to calculate its balance as the sum of its credit and debit transactions" do
-    @invoice.balance.should == -282.12
+    @invoice.balance.should == -28212
   end
   
   it "should be considered as settled if its balance is zero" do
     @invoice.balance.should_not be_zero
     @invoice.settled?.should be_false
     
-    @invoice.add_credit_transaction amount: 282.12
+    @invoice.add_credit_transaction amount: 28212
     @invoice.save!
     
     @invoice.balance.should be_zero
@@ -58,7 +58,7 @@ describe Invoicing::Invoice do
   end
   
   it "should not report as overdue if the invoice has been settled" do
-    @invoice.add_credit_transaction amount: 282.12
+    @invoice.add_credit_transaction amount: 28212
     @invoice.due_date = Date.today - 1.days
     @invoice.save!
     
@@ -67,7 +67,7 @@ describe Invoicing::Invoice do
   
   it "should find all invoices which are owing" do
     invoice = Invoicing::Invoice.new
-    invoice.add_line_item description: "Line Item 1", amount: 11.01
+    invoice.add_line_item description: "Line Item 1", amount: 1101
     invoice.save!
     
     Invoicing::Invoice.owing.count.should == 2    
@@ -101,7 +101,7 @@ describe Invoicing::Invoice do
     
     it "should be able to attach an invoiceable item to the line item" do
       invoice = Invoicing::Invoice.new
-      invoice.add_line_item description: "Line Item 1", amount: 11.01, invoiceable: @invoice # yes, we're invoicing an invoice
+      invoice.add_line_item description: "Line Item 1", amount: 1101, invoiceable: @invoice # yes, we're invoicing an invoice
       invoice.save!
       
       invoice.line_items.first.invoiceable.should == @invoice
