@@ -74,6 +74,29 @@ module Invoicing
     def self.for_payment_reference(reference)
       PaymentReference.where(reference: reference).map(&:invoice)
     end
+    
+    def line_item(cost_item)
+      if cost_item.is_a? Hash
+        add_line_item(
+          amount: cost_item[:amount],
+          description: cost_item[:description] || 'Line Item'
+        )
+      else
+        add_line_item(
+          invoiceable: cost_item,
+          amount: cost_item.amount,
+          description: cost_item.description || 'Line Item'
+        )
+      end
+    end
+    
+    def payment_reference(reference)
+      add_payment_reference(reference: reference)
+    end
+    
+    def set_due_date(due_date)
+      self.due_date = due_date
+    end
   
   end
 end

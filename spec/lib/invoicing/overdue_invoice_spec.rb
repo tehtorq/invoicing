@@ -8,33 +8,39 @@ describe Invoicing::OverdueInvoice do
   end
    
   it "should find all invoices which are overdue" do
-    invoice = Invoicing::Invoice.new(due_date: Time.now)
-    invoice.add_line_item description: "Line Item 1", amount: 1101
-    invoice.save!
+    Invoicing::invoice do
+      line_item description: "Line Item 1", amount: 1101
+      set_due_date Time.now
+    end
     
-    invoice = Invoicing::Invoice.new(due_date: Time.now - 1.days)
-    invoice.add_line_item description: "Line Item 1", amount: 1101
-    invoice.save!
+    Invoicing::invoice do
+      set_due_date Time.now - 1.days
+      line_item description: "Line Item 1", amount: 1101
+    end
     
-    invoice = Invoicing::Invoice.new(due_date: Time.now - 1.days)
-    invoice.add_line_item description: "Line Item 1", amount: 0
-    invoice.save!
+    Invoicing::invoice do
+      set_due_date Time.now - 1.days
+      line_item description: "Line Item 1", amount: 0
+    end
     
     Invoicing::OverdueInvoice.all.count.should == 1
   end
   
   it "should record a late payment against an invoice which is overdue" do
-    invoice1 = Invoicing::Invoice.new(due_date: Time.now)
-    invoice1.add_line_item description: "Line Item 1", amount: 1101
-    invoice1.save!
+    Invoicing::invoice do
+      set_due_date Time.now
+      line_item description: "Line Item 1", amount: 1101
+    end
     
-    invoice2 = Invoicing::Invoice.new(due_date: Time.now - 1.days)
-    invoice2.add_line_item description: "Line Item 1", amount: 1101
-    invoice2.save!
+    invoice2 = Invoicing::invoice do
+      set_due_date Time.now - 1.days
+      line_item description: "Line Item 1", amount: 1101
+    end
     
-    invoice3 = Invoicing::Invoice.new(due_date: Time.now - 1.days)
-    invoice3.add_line_item description: "Line Item 1", amount: 0
-    invoice3.save!
+    Invoicing::invoice do
+      set_due_date Time.now - 1.days
+      line_item description: "Line Item 1", amount: 0
+    end
     
     Invoicing::OverdueInvoice.record_late_payments!
     
@@ -45,9 +51,10 @@ describe Invoicing::OverdueInvoice do
   end
   
   it "should default the late payment penalty date to 7 days from the date the late payment was recorded" do
-    invoice = Invoicing::Invoice.new(due_date: Time.now - 1.days)
-    invoice.add_line_item description: "Line Item 1", amount: 1101
-    invoice.save!
+    invoice = Invoicing::invoice do
+      set_due_date Time.now - 1.days
+      line_item description: "Line Item 1", amount: 1101
+    end
     
     Invoicing::OverdueInvoice.record_late_payments!
     invoice.late_payment.penalty_date.should == Date.today.to_time + 7.days

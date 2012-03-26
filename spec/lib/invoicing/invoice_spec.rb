@@ -6,18 +6,18 @@ describe Invoicing::Invoice do
   before(:each) do
     tear_it_down
     
-    @invoice = Invoicing::Invoice.new
-    @invoice.add_line_item description: "Line Item 1", amount: 1101
-    @invoice.add_line_item description: "Line Item 2", amount: 5097
-    @invoice.add_line_item description: "Line Item 3", amount: 1714
-    @invoice.add_line_item description: "Line Item 4", amount: 20300
-    @invoice.save!
+    @invoice = Invoicing::invoice do
+      line_item description: "Line Item 1", amount: 1101
+      line_item description: "Line Item 2", amount: 5097
+      line_item description: "Line Item 3", amount: 1714
+      line_item description: "Line Item 4", amount: 20300
+    end
   end
   
   it "should be able to add a line item" do
-    invoice = Invoicing::Invoice.new
-    invoice.add_line_item description: "Line Item 1", amount: 1101
-    invoice.save!
+    invoice = Invoicing::invoice do
+      line_item description: "Line Item 1", amount: 1101
+    end
     
     line_items = invoice.line_items
     line_items.count.should == 1
@@ -66,31 +66,31 @@ describe Invoicing::Invoice do
   end
   
   it "should find all invoices which are owing" do
-    invoice = Invoicing::Invoice.new
-    invoice.add_line_item description: "Line Item 1", amount: 1101
-    invoice.save!
+    invoice = Invoicing::invoice do
+      line_item description: "Line Item 1", amount: 1101
+    end
     
     Invoicing::Invoice.owing.count.should == 2    
   end
   
   it "should be able to register multiple references to look up invoices by" do
-    invoice = Invoicing::Invoice.new
-    invoice.add_payment_reference(reference: "Mr. Anderson")
-    invoice.add_payment_reference(reference: "REF23934")
-    invoice.save!
+    invoice = Invoicing::invoice do
+      payment_reference "Mr. Anderson"
+      payment_reference "REF23934"
+    end
     
     invoice.payment_references.map(&:reference).should == ["Mr. Anderson", "REF23934"]
   end
   
   it "should be able to find invoices for a given reference" do
-    invoice1 = Invoicing::Invoice.new
-    invoice1.add_payment_reference(reference: "Mr. Anderson")
-    invoice1.add_payment_reference(reference: "REF23934")
-    invoice1.save!
+    invoice1 = Invoicing::invoice do
+      payment_reference "Mr. Anderson"
+      payment_reference "REF23934"
+    end
     
-    invoice2 = Invoicing::Invoice.new
-    invoice2.add_payment_reference(reference: "Mr. Anderson")
-    invoice2.save
+    invoice2 = Invoicing::invoice do
+      payment_reference "Mr. Anderson"
+    end
     
     Invoicing::Invoice.for_payment_reference("Mr. Anderson").should == [invoice1, invoice2]
     Invoicing::Invoice.for_payment_reference("REF23934").should == [invoice1]
@@ -100,12 +100,13 @@ describe Invoicing::Invoice do
   context "when adding a line item" do
     
     it "should be able to attach an invoiceable item to the line item" do
-      invoice = Invoicing::Invoice.new
-      invoice.add_line_item description: "Line Item 1", amount: 1101, invoiceable: @invoice # yes, we're invoicing an invoice
-      invoice.save!
+      item_to_invoice = @invoice.extend(Invoiceable)
+      
+      invoice = Invoicing::invoice do
+        line_item item_to_invoice
+      end
       
       invoice.line_items.first.invoiceable.should == @invoice
-      
     end
   end
   
