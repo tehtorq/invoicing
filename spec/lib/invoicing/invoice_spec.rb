@@ -6,7 +6,7 @@ describe Invoicing::Invoice do
   before(:each) do
     tear_it_down
     
-    @invoice = Invoicing::invoice do
+    @invoice = Invoicing::generate do
       line_item description: "Line Item 1", amount: 1101
       line_item description: "Line Item 2", amount: 5097
       line_item description: "Line Item 3", amount: 1714
@@ -15,7 +15,7 @@ describe Invoicing::Invoice do
   end
   
   it "should be able to add a line item" do
-    invoice = Invoicing::invoice do
+    invoice = Invoicing::generate do
       line_item description: "Line Item 1", amount: 1101
     end
     
@@ -66,7 +66,7 @@ describe Invoicing::Invoice do
   end
   
   it "should find all invoices which are owing" do
-    invoice = Invoicing::invoice do
+    invoice = Invoicing::generate do
       line_item description: "Line Item 1", amount: 1101
     end
     
@@ -74,7 +74,7 @@ describe Invoicing::Invoice do
   end
   
   it "should be able to register multiple references to look up invoices by" do
-    invoice = Invoicing::invoice do
+    invoice = Invoicing::generate do
       payment_reference "Mr. Anderson"
       payment_reference "REF23934"
     end
@@ -83,12 +83,12 @@ describe Invoicing::Invoice do
   end
   
   it "should be able to find invoices for a given reference" do
-    invoice1 = Invoicing::invoice do
+    invoice1 = Invoicing::generate do
       payment_reference "Mr. Anderson"
       payment_reference "REF23934"
     end
     
-    invoice2 = Invoicing::invoice do
+    invoice2 = Invoicing::generate do
       payment_reference "Mr. Anderson"
     end
     
@@ -102,7 +102,7 @@ describe Invoicing::Invoice do
     it "should be able to attach an invoiceable item to the line item" do
       item_to_invoice = @invoice.extend(Invoiceable)
       
-      invoice = Invoicing::invoice do
+      invoice = Invoicing::generate do
         line_item item_to_invoice
       end
       

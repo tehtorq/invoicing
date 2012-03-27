@@ -9,19 +9,14 @@ module Invoicing
   
   #CONFIG_DIR = File.expand_path(File.dirname(__FILE__)) + "/config"
   
-  def self.invoice(&block)
+  def self.generate(&block)
     #b = block
     
     #Invoice.transaction do
       invoice = Invoice.new
       invoice.instance_eval(&block)
       invoice.save!
-      
-      invoice.line_items.map(&:invoiceable).compact.each do |item|
-        item.invoiced = true
-        item.invoice_id = invoice.id
-        item.save!
-      end
+      invoice.mark_items_invoiced!
     #end
     
     invoice

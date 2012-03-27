@@ -75,6 +75,14 @@ module Invoicing
       PaymentReference.where(reference: reference).map(&:invoice)
     end
     
+    def mark_items_invoiced!
+      line_items.map(&:invoiceable).compact.each do |item|
+        item.invoiced = true
+        item.invoice_id = id
+        item.save!
+      end
+    end
+    
     def line_item(cost_item)
       if cost_item.is_a? Hash
         add_line_item(
@@ -94,7 +102,7 @@ module Invoicing
       add_payment_reference(reference: reference)
     end
     
-    def set_due_date(due_date)
+    def due(due_date)
       self.due_date = due_date
     end
   

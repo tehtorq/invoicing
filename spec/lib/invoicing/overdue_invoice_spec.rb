@@ -8,18 +8,18 @@ describe Invoicing::OverdueInvoice do
   end
    
   it "should find all invoices which are overdue" do
-    Invoicing::invoice do
+    Invoicing::generate do
       line_item description: "Line Item 1", amount: 1101
-      set_due_date Time.now
+      due Time.now
     end
     
-    Invoicing::invoice do
-      set_due_date Time.now - 1.days
+    Invoicing::generate do
+      due Time.now - 1.days
       line_item description: "Line Item 1", amount: 1101
     end
     
-    Invoicing::invoice do
-      set_due_date Time.now - 1.days
+    Invoicing::generate do
+      due Time.now - 1.days
       line_item description: "Line Item 1", amount: 0
     end
     
@@ -27,18 +27,18 @@ describe Invoicing::OverdueInvoice do
   end
   
   it "should record a late payment against an invoice which is overdue" do
-    Invoicing::invoice do
-      set_due_date Time.now
+    Invoicing::generate do
+      due Time.now
       line_item description: "Line Item 1", amount: 1101
     end
     
-    invoice2 = Invoicing::invoice do
-      set_due_date Time.now - 1.days
+    invoice2 = Invoicing::generate do
+      due Time.now - 1.days
       line_item description: "Line Item 1", amount: 1101
     end
     
-    Invoicing::invoice do
-      set_due_date Time.now - 1.days
+    Invoicing::generate do
+      due Time.now - 1.days
       line_item description: "Line Item 1", amount: 0
     end
     
@@ -51,8 +51,8 @@ describe Invoicing::OverdueInvoice do
   end
   
   it "should default the late payment penalty date to 7 days from the date the late payment was recorded" do
-    invoice = Invoicing::invoice do
-      set_due_date Time.now - 1.days
+    invoice = Invoicing::generate do
+      due Time.now - 1.days
       line_item description: "Line Item 1", amount: 1101
     end
     
