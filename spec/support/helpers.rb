@@ -5,6 +5,7 @@ module Helpers
     Invoicing::Transaction.delete_all
     Invoicing::LatePayment.delete_all
     Invoicing::PaymentReference.delete_all
+    Invoicing::Seller.delete_all
   end
 end                                                                                                                                   
                                                                                                                                       

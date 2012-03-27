@@ -82,6 +82,16 @@ describe Invoicing::Invoice do
     invoice.payment_references.map(&:reference).should == ["Mr. Anderson", "REF23934"]
   end
   
+  it "should be able to specify the seller" do
+    seller = Invoicing::Seller.create!
+    
+    invoice = Invoicing::generate do
+      from seller
+    end
+    
+    invoice.seller.should == seller
+  end
+  
   it "should be able to find invoices for a given reference" do
     invoice1 = Invoicing::generate do
       payment_reference "Mr. Anderson"

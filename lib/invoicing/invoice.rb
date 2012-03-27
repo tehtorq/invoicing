@@ -4,6 +4,7 @@ module Invoicing
     has_many :transactions
     has_many :payment_references
     has_one :late_payment
+    belongs_to :seller
   
     before_save :calculate_totals, :calculate_balance
     after_create :create_initial_transaction!
@@ -104,6 +105,10 @@ module Invoicing
     
     def due(due_date)
       self.due_date = due_date
+    end
+    
+    def from(seller)
+      self.seller = seller
     end
   
   end
