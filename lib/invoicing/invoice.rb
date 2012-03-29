@@ -7,7 +7,7 @@ module Invoicing
     belongs_to :seller
   
     before_save :calculate_totals, :calculate_balance
-    after_create :create_initial_transaction!
+    after_create :create_initial_transaction!, :set_invoice_number!
     
     def add_line_item(params)
       self.line_items << LineItem.new(params)
@@ -33,6 +33,11 @@ module Invoicing
         add_debit_transaction amount: total
       end
 
+      save!
+    end
+    
+    def set_invoice_number!
+      self.invoice_number = "INV#{id}"
       save!
     end
       

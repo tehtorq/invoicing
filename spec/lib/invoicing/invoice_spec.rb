@@ -50,6 +50,10 @@ describe Invoicing::Invoice do
     @invoice.settled?.should be_true
   end
   
+  it "should generate a unique invoice number" do
+    @invoice.invoice_number.should == "INV#{@invoice.id}"
+  end
+  
   it "should report as overdue if it is not settled and the due date has past" do
     @invoice.due_date = Date.today - 1.days
     @invoice.save!
