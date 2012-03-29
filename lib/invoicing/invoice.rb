@@ -5,6 +5,7 @@ module Invoicing
     has_many :payment_references
     has_one :late_payment
     belongs_to :seller
+    has_one :invoice_decorator
   
     before_save :calculate_totals, :calculate_balance
     after_create :create_initial_transaction!, :set_invoice_number!

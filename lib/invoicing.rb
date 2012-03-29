@@ -25,6 +25,7 @@ require "invoicing/late_payment"
 require "invoicing/line_item"
 require "invoicing/payment_reference"
 require "invoicing/seller"
+require "invoicing/invoice_decorator"
 
 require "invoicing/invoice"
 require "invoicing/overdue_invoice"
