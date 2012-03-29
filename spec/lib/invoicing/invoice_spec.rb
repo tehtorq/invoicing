@@ -124,4 +124,16 @@ describe Invoicing::Invoice do
     end
   end
   
+  it "should be able to add decoration data to the invoice" do
+    item_to_invoice = @invoice.extend(Invoicing::Invoiceable)
+    decoration = {invoicee: "Bob Jones"}
+    
+    invoice = Invoicing::generate do
+      line_item item_to_invoice
+      decorate_with decoration
+    end
+    
+    invoice.decorator.data.should == {invoicee: "Bob Jones"}
+  end
+  
 end

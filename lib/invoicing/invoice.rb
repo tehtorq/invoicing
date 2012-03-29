@@ -10,6 +10,8 @@ module Invoicing
     before_save :calculate_totals, :calculate_balance
     after_create :create_initial_transaction!, :set_invoice_number!
     
+    alias :decorator :invoice_decorator
+    
     def add_line_item(params)
       self.line_items << LineItem.new(params)
     end
@@ -121,6 +123,10 @@ module Invoicing
     
     def from(seller)
       self.seller = seller
+    end
+    
+    def decorate_with(decorations)
+      self.invoice_decorator = InvoiceDecorator.new data: decorations
     end
   
   end
