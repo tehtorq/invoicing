@@ -47,6 +47,7 @@ class CreateInvoicingTables < ActiveRecord::Migration
     end
     
     create_table "invoicing_invoice_decorators", :force => true do |t|
+      t.integer "invoice_id"
       t.text "data"
       t.timestamps
     end
