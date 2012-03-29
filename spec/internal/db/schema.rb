@@ -30,7 +30,7 @@ ActiveRecord::Schema.define do
     t.string   "invoice_number"
     t.datetime "due_date"
     t.integer  "total"
-    t.integer  "vat_amount"
+    t.integer  "tax"
     t.integer  "balance"
     t.timestamps
   end

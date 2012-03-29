@@ -22,8 +22,8 @@ module Invoicing
     end
     
     def calculate_totals
-      self.total = line_items.inject(0) {|res, item| res + item.amount.to_f}
-      self.vat_amount = 0 # fix
+      self.total = line_items.inject(0) {|res, item| res + item.amount.to_i}
+      self.tax = line_items.inject(0) {|res, item| res + item.tax.to_i}
     end
       
     def create_initial_transaction!
@@ -46,6 +46,10 @@ module Invoicing
       
     def calculate_balance
       self.balance = (0 - debit_transactions.sum(&:amount)) + credit_transactions.sum(&:amount)
+    end
+    
+    def net_total
+      total - tax
     end
       
     def settled?
