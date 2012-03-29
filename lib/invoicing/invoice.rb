@@ -88,12 +88,14 @@ module Invoicing
       if cost_item.is_a? Hash
         add_line_item(
           amount: cost_item[:amount],
+          tax: cost_item[:tax] || 0,
           description: cost_item[:description] || 'Line Item'
         )
       else
         add_line_item(
           invoiceable: cost_item,
           amount: cost_item.amount,
+          tax: cost_item.tax,
           description: cost_item.description || 'Line Item'
         )
       end

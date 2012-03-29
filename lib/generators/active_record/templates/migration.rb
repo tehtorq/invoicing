@@ -13,6 +13,7 @@ class CreateInvoicingTables < ActiveRecord::Migration
       t.integer "invoice_id"
       t.string  "description"
       t.integer "amount"
+      t.integer "tax"
       t.integer "invoiceable_id"
       t.string "invoiceable_type"
       t.timestamps

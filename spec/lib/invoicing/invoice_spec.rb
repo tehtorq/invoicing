@@ -110,7 +110,7 @@ describe Invoicing::Invoice do
   context "when adding a line item" do
     
     it "should be able to attach an invoiceable item to the line item" do
-      item_to_invoice = @invoice.extend(Invoiceable)
+      item_to_invoice = @invoice.extend(Invoicing::Invoiceable)
       
       invoice = Invoicing::generate do
         line_item item_to_invoice
