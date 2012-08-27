@@ -11,6 +11,9 @@ describe Invoicing::Invoice do
       line_item description: "Line Item 2", amount: 5097
       line_item description: "Line Item 3", amount: 1714
       line_item description: "Line Item 4", amount: 20300
+
+      payment_reference "REF123"
+      decorate_with tenant_name: "Peter"
     end
   end
   
@@ -134,6 +137,50 @@ describe Invoicing::Invoice do
     end
     
     invoice.decorator.data.should == {invoicee: "Bob Jones"}
+  end
+
+  context "destroying an invoice" do
+
+    before(:each) do
+      
+    end
+
+    it "should destroy its associated line items" do
+      Invoicing::LineItem.create!
+      Invoicing::LineItem.count.should == 5
+      @invoice.destroy
+      Invoicing::LineItem.count.should == 1
+    end
+
+    it "should destroy its associated transactions" do
+      Invoicing::Transaction.create!
+      Invoicing::Transaction.count.should == 2
+      @invoice.destroy
+      Invoicing::Transaction.count.should == 1
+    end
+
+    it "should destroy its associated payment_references" do
+      Invoicing::PaymentReference.create!
+      Invoicing::PaymentReference.count.should == 2
+      @invoice.destroy
+      Invoicing::PaymentReference.count.should == 1
+    end
+
+    it "should destroy its associated late payments" do
+      Invoicing::LatePayment.create!
+      Invoicing::LatePayment.create! invoice_id: @invoice.id
+      Invoicing::LatePayment.count.should == 2
+      @invoice.destroy
+      Invoicing::LatePayment.count.should == 1
+    end
+
+    it "should destroy its associated decorator" do
+      Invoicing::InvoiceDecorator.create!
+      Invoicing::InvoiceDecorator.count.should == 2
+      @invoice.destroy
+      Invoicing::InvoiceDecorator.count.should == 1
+    end
+
   end
   
 end

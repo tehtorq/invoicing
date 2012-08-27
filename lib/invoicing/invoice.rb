@@ -1,11 +1,11 @@
 module Invoicing
   class Invoice < ActiveRecord::Base
-    has_many :line_items
-    has_many :transactions
-    has_many :payment_references
-    has_one :late_payment
+    has_many :line_items, dependent: :destroy
+    has_many :transactions, dependent: :destroy
+    has_many :payment_references, dependent: :destroy
+    has_one :late_payment, dependent: :destroy
     belongs_to :seller
-    has_one :invoice_decorator
+    has_one :invoice_decorator, dependent: :destroy
   
     before_save :calculate_totals, :calculate_balance
     after_create :create_initial_transaction!, :set_invoice_number!
