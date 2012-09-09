@@ -52,9 +52,55 @@ describe Invoicing::Invoice do
     @invoice.balance.should be_zero
     @invoice.settled?.should be_true
   end
+
+  context "specifying an invoice number" do
   
-  it "should generate a unique invoice number" do
-    @invoice.invoice_number.should == "INV#{@invoice.id}"
+    it "should default the invoice number to a format of INV{invoice id}" do
+      @invoice.invoice_number.should == "INV#{@invoice.id}"
+    end
+
+    it "should allow a specific invoice number to be specified" do
+      invoice = Invoicing::generate do
+        numbered "CUSTOMREF123"
+      end
+      
+      invoice.invoice_number.should == "CUSTOMREF123"
+    end
+
+    it "should validate that the invoice number is unique per seller" do
+      seller = Invoicing::Seller.create!
+
+      invoice = Invoicing::generate do
+        numbered "CUSTOMREF123"
+        from seller
+      end
+
+      expect {
+        invoice = Invoicing::generate do
+          numbered "CUSTOMREF123"
+          from seller
+        end
+      }.to raise_error(ActiveRecord::RecordInvalid, "Validation failed: Invoice number has already been taken")
+    end
+
+    it "should allow two invoices with the same invoice number, but from different sellers" do
+      first_seller = Invoicing::Seller.create!
+
+      invoice = Invoicing::generate do
+        numbered "CUSTOMREF123"
+        from first_seller
+      end
+
+      second_seller = Invoicing::Seller.create!
+
+      expect {
+        invoice = Invoicing::generate do
+          numbered "CUSTOMREF123"
+          from second_seller
+        end
+      }.to_not raise_error
+    end
+
   end
   
   it "should report as overdue if it is not settled and the due date has past" do
@@ -80,7 +126,7 @@ describe Invoicing::Invoice do
     Invoicing::Invoice.owing.count.should == 2    
   end
   
-  it "should be able to register multiple references to look up invoices by" do
+  it "should be able to register multiple payment references to look up invoices by" do
     invoice = Invoicing::generate do
       payment_reference "Mr. Anderson"
       payment_reference "REF23934"

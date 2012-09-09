@@ -6,9 +6,11 @@ module Invoicing
     has_one :late_payment, dependent: :destroy
     belongs_to :seller
     has_one :invoice_decorator, dependent: :destroy
+
+    validates_uniqueness_of :invoice_number, scope: [:seller_id]
   
     before_save :calculate_totals, :calculate_balance
-    after_create :create_initial_transaction!, :set_invoice_number!
+    after_create :create_initial_transaction!, :default_invoice_number!
     
     alias :decorator :invoice_decorator
     
@@ -39,8 +41,8 @@ module Invoicing
       save!
     end
     
-    def set_invoice_number!
-      self.invoice_number = "INV#{id}"
+    def default_invoice_number!
+      self.invoice_number ||= "INV#{id}"
       save!
     end
       
@@ -127,6 +129,10 @@ module Invoicing
     
     def decorate_with(decorations)
       self.invoice_decorator = InvoiceDecorator.new data: decorations
+    end
+
+    def numbered(invoice_number)
+      self.invoice_number = invoice_number
     end
   
   end
