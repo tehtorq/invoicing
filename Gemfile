@@ -7,6 +7,4 @@ group :development do
   gem 'rspec'
   gem 'rspec-rails'
   gem 'sqlite3'
-  gem 'factory_girl'
-  gem 'faker'
 end
