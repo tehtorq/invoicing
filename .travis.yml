@@ -1,0 +1,3 @@
+language: ruby
+before_script:
+  - cp spec/internal/config/database.yml.sample spec/internal/config/database.yml
