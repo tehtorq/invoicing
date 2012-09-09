@@ -67,6 +67,14 @@ describe Invoicing::Invoice do
       invoice.invoice_number.should == "CUSTOMREF123"
     end
 
+    it "should allow a custom invoice number format to be specified containing the invoice id" do
+      invoice = Invoicing::generate do
+        numbered "CUSTOMREF{id}"
+      end
+
+      invoice.invoice_number.should == "CUSTOMREF#{invoice.id}"
+    end
+
     it "should validate that the invoice number is unique per seller" do
       seller = Invoicing::Seller.create!
 

@@ -10,7 +10,7 @@ module Invoicing
     validates_uniqueness_of :invoice_number, scope: [:seller_id]
   
     before_save :calculate_totals, :calculate_balance
-    after_create :create_initial_transaction!, :default_invoice_number!
+    after_create :create_initial_transaction!, :set_invoice_number!
     
     alias :decorator :invoice_decorator
     
@@ -41,8 +41,9 @@ module Invoicing
       save!
     end
     
-    def default_invoice_number!
+    def set_invoice_number!
       self.invoice_number ||= "INV#{id}"
+      self.invoice_number.gsub!("{id}", "#{id}")
       save!
     end
       
