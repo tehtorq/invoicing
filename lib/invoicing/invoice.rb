@@ -102,15 +102,15 @@ module Invoicing
     def line_item(cost_item)
       if cost_item.is_a? Hash
         add_line_item(
-          amount: cost_item[:amount],
+          amount: cost_item[:amount] || 0,
           tax: cost_item[:tax] || 0,
           description: cost_item[:description] || 'Line Item'
         )
       else
         add_line_item(
           invoiceable: cost_item,
-          amount: cost_item.amount,
-          tax: cost_item.tax,
+          amount: cost_item.amount || 0,
+          tax: cost_item.tax || 0,
           description: cost_item.description || 'Line Item'
         )
       end
