@@ -1,5 +1,7 @@
-Basic Usage
 
+[![Build Status](https://secure.travis-ci.org/tehtorq/invoicing.png)](http://travis-ci.org/tehtorq/invoicing)
+
+Basic Usage
 
     seller = Seller.find(3)
     book = Book.find(1) # implements CostItem
@@ -12,4 +14,22 @@ Basic Usage
       payment_reference "REF2345"
       decorate_with decorations
     end
+
+Invoice Numbering:
+
+A default invoice number will be set with the format INV[invoice id].
+
+A custom invoice number can be specified as follows:
+
+    invoice = Invoicing::generate do
+      numbered "CUSTOMREF123"
+    end
+
+You can specify a custom invoice number containing the invoice id as follows:
+
+    invoice = Invoicing::generate do
+      numbered "CUSTOMREF{id}"
+    end
+
+  
     
