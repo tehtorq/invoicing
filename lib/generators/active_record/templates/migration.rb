@@ -33,6 +33,7 @@ class CreateInvoicingTables < ActiveRecord::Migration
       t.integer  "total"
       t.integer  "tax"
       t.integer  "balance"
+      t.string   "type"
       t.timestamps
     end
     
@@ -50,6 +51,16 @@ class CreateInvoicingTables < ActiveRecord::Migration
       t.integer "invoice_id"
       t.text "data"
       t.timestamps
+    end
+
+    create_table "invoicing_credit_note_invoices", :force => true do |t|
+      t.integer "invoice_id"
+      t.integer "credit_note_id"
+    end
+
+    create_table "invoicing_credit_note_credit_transactions", :force => true do |t|
+      t.integer "credit_note_id"
+      t.integer "transaction_id"
     end
  
   end

@@ -193,6 +193,69 @@ describe Invoicing::Invoice do
     invoice.decorator.data.should == {invoicee: "Bob Jones"}
   end
 
+  context "when recording a credit note" do
+
+    context "against an invoice" do
+      before(:each) do
+
+        invoice = @invoice
+
+        @credit_note = Invoicing::generate_credit_note do
+          line_item description: "Credit note against #{invoice.invoice_number}", amount: invoice.total, against_invoice: invoice
+
+          decorate_with tenant_name: "Peter"
+        end
+
+        @invoice.reload
+      end
+
+      it "should have a receipt number" do
+        @credit_note.receipt_number.should == "CN#{@credit_note.id}"
+      end
+
+      it "should be able to record a line item for the credit note" do
+        @credit_note.line_items.count.should == 1
+      end
+
+      it "should create a credit transaction against the invoice" do
+        @invoice.settled?.should be_true
+      end
+
+      it "should know if it is linked to an invoice" do
+        @credit_note.credit_note_invoices.first.invoice.should == @invoice
+      end
+
+      it "should be linked to the credit transaction paid against the invoice" do
+        @credit_note.credit_note_credit_transactions.count.should == 1
+      end
+
+    end
+
+    context "standalone credit note" do
+      before(:each) do
+        @credit_note = Invoicing::generate_credit_note do
+          line_item description: "Credit note for Customer 1", amount: 4500
+
+          decorate_with tenant_name: "Peter"
+        end
+      end
+
+      it "should be able to record a line item for the credit note" do
+        @credit_note.line_items.count.should == 1
+      end
+
+      it "should not be linked to an invoice" do
+        @credit_note.credit_note_invoices.should be_blank
+      end
+
+      it "should not create a credit transaction against the invoice" do
+        @credit_note.credit_note_credit_transactions.should be_blank
+      end
+
+    end
+
+  end
+
   context "destroying an invoice" do
 
     before(:each) do

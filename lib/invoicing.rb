@@ -14,6 +14,13 @@ module Invoicing
     invoice.mark_items_invoiced!    
     invoice
   end
+
+  def self.generate_credit_note(&block)
+    credit_note = CreditNote.new
+    credit_note.instance_eval(&block)
+    credit_note.save!
+    credit_note
+  end
   
 end
 
@@ -26,6 +33,9 @@ require "invoicing/line_item"
 require "invoicing/payment_reference"
 require "invoicing/seller"
 require "invoicing/invoice_decorator"
+require "invoicing/credit_note_invoice"
+require "invoicing/credit_note_credit_transaction"
 
 require "invoicing/invoice"
+require "invoicing/credit_note"
 require "invoicing/overdue_invoice"
