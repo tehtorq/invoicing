@@ -17,11 +17,8 @@ module Invoicing
       end
     end
 
-    def line_item(cost_item)
-      super(cost_item)
-      if cost_item[:against_invoice]
-        record_amount_against_invoice(self.line_items.last.amount, cost_item[:against_invoice])
-      end
+    def annul(params={})
+      record_amount_against_invoice(params[:amount], params[:against_invoice]) if params[:against_invoice]
     end
 
     def set_invoice_number!

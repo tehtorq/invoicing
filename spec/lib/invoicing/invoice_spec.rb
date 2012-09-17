@@ -201,8 +201,9 @@ describe Invoicing::Invoice do
         invoice = @invoice
 
         @credit_note = Invoicing::generate_credit_note do
-          line_item description: "Credit note against #{invoice.invoice_number}", amount: invoice.total, against_invoice: invoice
+          annul amount: invoice.total, against_invoice: invoice
 
+          line_item description: "Credit note for Customer 1", amount: invoice.total
           decorate_with tenant_name: "Peter"
         end
 
@@ -215,6 +216,7 @@ describe Invoicing::Invoice do
 
       it "should be able to record a line item for the credit note" do
         @credit_note.line_items.count.should == 1
+        @credit_note.line_items.first.amount.should == @invoice.total
       end
 
       it "should create a credit transaction against the invoice" do
@@ -233,8 +235,11 @@ describe Invoicing::Invoice do
 
     context "standalone credit note" do
       before(:each) do
+        invoice = @invoice
+
         @credit_note = Invoicing::generate_credit_note do
-          line_item description: "Credit note for Customer 1", amount: 4500
+          annul amount: invoice.total
+          line_item description: "Credit note for Customer 1", amount: invoice.total
 
           decorate_with tenant_name: "Peter"
         end
