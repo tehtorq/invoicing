@@ -1,19 +1,43 @@
 module Invoicing
   class CreditNote < Invoice
-    has_many :credit_note_invoices, dependent: :destroy
+    has_one :credit_note_invoice, dependent: :destroy
+    has_one :invoice, through: :credit_note_invoice
     has_many :credit_note_credit_transactions, dependent: :destroy
 
-    def record_amount_against_invoice(amount, invoice)
-      self.credit_note_invoices << CreditNoteInvoice.new(invoice_id: invoice.id)
-      invoice.add_credit_transaction(amount: amount)
-      invoice.save #update invoice balance
+    def record_transaction_against_invoice!
+      raise RuntimeError, "You must allocate a credit note against an invoice." if invoice.blank?
 
-      self.credit_note_credit_transactions << CreditNoteCreditTransaction.new(transaction: invoice.transactions.last)
+      invoice.add_credit_transaction(amount: total)
+      invoice.save!
+      CreditNoteCreditTransaction.create!(transaction: invoice.transactions.last, credit_note_id: self.id)
     end
 
-    def against_invoices(invoices)
-      invoices.each do |invoice|
-        against_invoice(invoice)
+    def credit(cost_item)
+      if cost_item.is_a? Hash
+        add_line_item(
+          amount: cost_item[:amount] || 0,
+          tax: cost_item[:tax] || 0,
+          description: cost_item[:description] || 'Line Item',
+          invoiceable: cost_item[:line_item] || nil
+        )
+      else
+        add_line_item(
+          invoiceable: cost_item,
+          amount: cost_item.amount || 0,
+          tax: cost_item.tax || 0,
+          description: cost_item.description || 'Line Item'
+        )
+      end
+    end
+
+    def against_invoice(invoice)
+      self.credit_note_invoice = CreditNoteInvoice.new(invoice_id: invoice.id)
+    end
+
+    def record_credit_notes!
+      line_items.map(&:invoiceable).compact.each do |item|
+        item.credit_amount if item.respond_to?(:credit_amount)
+        item.save!
       end
     end
 

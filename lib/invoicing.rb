@@ -19,6 +19,8 @@ module Invoicing
     credit_note = CreditNote.new
     credit_note.instance_eval(&block)
     credit_note.save!
+    credit_note.record_transaction_against_invoice!
+    credit_note.record_credit_notes!
     credit_note
   end
   

@@ -199,11 +199,14 @@ describe Invoicing::Invoice do
       before(:each) do
 
         invoice = @invoice
+        line_items = invoice.line_items
 
         @credit_note = Invoicing::generate_credit_note do
-          annul amount: invoice.total, against_invoice: invoice
+          line_items.each do |line_item|
+            credit amount: line_item.amount, line_item: line_item, description: "Credit note for Line Item #{line_item.id}", tax: 0
+          end
 
-          line_item description: "Credit note for Customer 1", amount: invoice.total
+          against_invoice invoice
           decorate_with tenant_name: "Peter"
         end
 
@@ -215,8 +218,8 @@ describe Invoicing::Invoice do
       end
 
       it "should be able to record a line item for the credit note" do
-        @credit_note.line_items.count.should == 1
-        @credit_note.line_items.first.amount.should == @invoice.total
+        @credit_note.line_items.count.should == @invoice.line_items.count
+        @credit_note.line_items.first.amount.should == @invoice.line_items.first.amount
       end
 
       it "should create a credit transaction against the invoice" do
@@ -224,39 +227,26 @@ describe Invoicing::Invoice do
       end
 
       it "should know if it is linked to an invoice" do
-        @credit_note.credit_note_invoices.first.invoice.should == @invoice
+        @credit_note.invoice.should == @invoice
       end
 
       it "should be linked to the credit transaction paid against the invoice" do
         @credit_note.credit_note_credit_transactions.count.should == 1
+        @credit_note.credit_note_credit_transactions.first.transaction.amount.should == @invoice.total
       end
 
     end
 
-    context "standalone credit note" do
-      before(:each) do
-        invoice = @invoice
+    context "trying to create a standalone credit note" do
 
-        @credit_note = Invoicing::generate_credit_note do
-          annul amount: invoice.total
-          line_item description: "Credit note for Customer 1", amount: invoice.total
-
+      it "should raise an error if no invoice is specified" do
+        expect {Invoicing::generate_credit_note do
+          line_items.each do |line_item|
+            credit amount: 500, description: "Credit note for Line Item #{line_item.id}", tax: 0
+          end
           decorate_with tenant_name: "Peter"
-        end
+        end}.to raise_error(RuntimeError, "You must allocate a credit note against an invoice.")
       end
-
-      it "should be able to record a line item for the credit note" do
-        @credit_note.line_items.count.should == 1
-      end
-
-      it "should not be linked to an invoice" do
-        @credit_note.credit_note_invoices.should be_blank
-      end
-
-      it "should not create a credit transaction against the invoice" do
-        @credit_note.credit_note_credit_transactions.should be_blank
-      end
-
     end
 
   end
