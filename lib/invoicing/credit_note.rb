@@ -36,7 +36,7 @@ module Invoicing
 
     def record_credit_notes!
       line_items.map(&:invoiceable).compact.each do |item|
-        item.credit_amount if item.respond_to?(:credit_amount)
+        item.credit_amount(item.amount) if item.respond_to?(:credit_amount)
         item.save!
       end
     end
