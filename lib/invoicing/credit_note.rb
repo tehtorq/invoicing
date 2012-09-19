@@ -35,11 +35,14 @@ module Invoicing
     end
 
     def record_credit_notes!
-      line_items.compact.each do |line_item|
+      line_items.each do |line_item|
         invoiceable = line_item.invoiceable
         next if invoiceable.blank?
+        
+        puts invoiceable.inspect
+        puts line_item.amount.inspect
 
-        invoiceable.credit_amount(line_item.amount) if invoiceable.respond_to?(:credit_amount)
+        invoiceable.handle_credit(line_item.amount) if invoiceable.respond_to?(:handle_credit)
       end
     end
 
