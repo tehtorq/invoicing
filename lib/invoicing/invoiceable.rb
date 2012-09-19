@@ -14,6 +14,11 @@ module Invoicing
     def description
       "Invoiceable Item"
     end
+
+    def handle_credit(amount)
+      puts "Hanlde credit"
+      self.amount = amount
+    end
   
   end
 end

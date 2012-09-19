@@ -194,10 +194,18 @@ describe Invoicing::Invoice do
   end
 
   context "when recording a credit note" do
+    before(:each) do
+      @invoice.line_items.each do |li|
+        li.invoiceable = li
+        li.invoiceable.extend(Invoicing::Invoiceable)
+        li.save!
+      end
+
+      @invoice.reload
+    end
 
     context "against an invoice" do
       before(:each) do
-
         invoice = @invoice
         line_items = invoice.line_items
 
@@ -207,7 +215,6 @@ describe Invoicing::Invoice do
           end
 
           against_invoice invoice
-          decorate_with tenant_name: "Peter"
         end
 
         @invoice.reload
@@ -233,6 +240,21 @@ describe Invoicing::Invoice do
       it "should be linked to the credit transaction paid against the invoice" do
         @credit_note.credit_note_credit_transactions.count.should == 1
         @credit_note.credit_note_credit_transactions.first.transaction.amount.should == @invoice.total
+      end
+
+    end
+
+    context "When applying credits to the invoiceables" do
+
+      it "should receive handle credit for each line item being credited" do
+        credit_note = Invoicing::CreditNote.new
+        credit_note.line_items = @invoice.line_items
+
+        credit_note.line_items.map(&:invoiceable).compact.each do |item|
+          item.should_receive(:handle_credit)
+        end
+
+        credit_note.record_credit_notes!
       end
 
     end

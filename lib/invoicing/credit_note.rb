@@ -6,28 +6,18 @@ module Invoicing
 
     def record_transaction_against_invoice!
       raise RuntimeError, "You must allocate a credit note against an invoice." if invoice.blank?
-
       invoice.add_credit_transaction(amount: total)
       invoice.save!
       CreditNoteCreditTransaction.create!(transaction: invoice.transactions.last, credit_note_id: self.id)
     end
 
-    def credit(cost_item)
-      if cost_item.is_a? Hash
-        add_line_item(
-          amount: cost_item[:amount] || 0,
-          tax: cost_item[:tax] || 0,
-          description: cost_item[:description] || 'Line Item',
-          invoiceable: cost_item[:line_item] || nil
-        )
-      else
-        add_line_item(
-          invoiceable: cost_item,
-          amount: cost_item.amount || 0,
-          tax: cost_item.tax || 0,
-          description: cost_item.description || 'Line Item'
-        )
-      end
+    def credit(options={})
+      add_line_item(
+        invoiceable: options[:line_item].invoiceable,
+        amount: options[:amount] || 0,
+        tax: options[:tax] || 0,
+        description: options[:description] || "Credit note against #{options[:line_item].description}" #?
+      )
     end
 
     def against_invoice(invoice)
