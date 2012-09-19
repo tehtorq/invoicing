@@ -36,9 +36,11 @@ module Invoicing
 
     def record_credit_notes!
       line_items.each do |line_item|
+        puts "DEBUG!!".inspect
+        puts line_item.inspect
         invoiceable = line_item.invoiceable
         next if invoiceable.blank?
-        
+
         puts invoiceable.inspect
         puts line_item.amount.inspect
 
