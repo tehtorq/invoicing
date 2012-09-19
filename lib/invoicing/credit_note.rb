@@ -12,6 +12,8 @@ module Invoicing
     end
 
     def credit(options={})
+      puts "Invoicing GEM!!!".inspect
+      puts options.inspect
       add_line_item(
         invoiceable: options[:line_item].invoiceable,
         amount: options[:amount] || 0,
