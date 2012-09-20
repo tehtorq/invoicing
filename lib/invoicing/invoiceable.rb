@@ -16,8 +16,12 @@ module Invoicing
     end
 
     def handle_credit(amount)
-      puts "Hanlde credit"
       self.amount = amount
+    end
+
+    def mark_invoiced(invoice_id)
+      self.invoice_id = invoice_id
+      self.invoiced = true
     end
   
   end

@@ -93,8 +93,7 @@ module Invoicing
     
     def mark_items_invoiced!
       line_items.map(&:invoiceable).compact.each do |item|
-        item.invoiced = true
-        item.invoice_id = id
+        item.mark_invoiced(id)
         item.save!
       end
     end
