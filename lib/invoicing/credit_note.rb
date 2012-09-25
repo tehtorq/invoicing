@@ -1,5 +1,7 @@
 module Invoicing
   class CreditNote < Invoice
+    alias_attribute :receipt_number, :invoice_number
+
     has_one :credit_note_invoice, dependent: :destroy
     has_one :invoice, through: :credit_note_invoice
     has_many :credit_note_credit_transactions, dependent: :destroy
@@ -37,14 +39,8 @@ module Invoicing
       record_amount_against_invoice(params[:amount], params[:against_invoice]) if params[:against_invoice]
     end
 
-    def set_invoice_number!
-      self.invoice_number ||= "CN#{id}"
-      self.invoice_number.gsub!("{id}", "#{id}")
-      save!
-    end
-
-    def receipt_number
-      self.invoice_number
+    def default_numbering_prefix
+      "CN"
     end
 
     def create_initial_transaction!

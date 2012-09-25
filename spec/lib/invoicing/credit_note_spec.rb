@@ -66,6 +66,12 @@ describe Invoicing::CreditNote do
         @credit_note.credit_note_credit_transactions.first.transaction.amount.should == @invoice.total
       end
 
+      it "should be recorded against the invoice" do
+        @invoice.reload
+        @invoice.credit_notes.count.should == 1
+        @invoice.credit_notes.first.receipt_number.should == "CN#{@credit_note.id}"
+      end
+
     end
 
     context "When applying credits to the invoiceables" do

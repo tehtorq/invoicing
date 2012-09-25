@@ -40,9 +40,17 @@ module Invoicing
 
       save!
     end
+
+    def credit_notes
+      CreditNoteInvoice.where(invoice_id: id).map(&:credit_note)
+    end
+
+    def default_numbering_prefix
+      "INV"
+    end
     
     def set_invoice_number!
-      self.invoice_number ||= "INV#{id}"
+      self.invoice_number ||= "#{default_numbering_prefix}#{id}"
       self.invoice_number.gsub!("{id}", "#{id}")
       save!
     end
