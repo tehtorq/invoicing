@@ -183,6 +183,7 @@ describe Invoicing::Invoice do
   
   it "should be able to add decoration data to the invoice" do
     item_to_invoice = @invoice.extend(Invoicing::Invoiceable)
+
     decoration = {invoicee: "Bob Jones"}
     
     invoice = Invoicing::generate do
@@ -200,7 +201,7 @@ describe Invoicing::Invoice do
     end
 
     it "should destroy its associated line items" do
-      Invoicing::LineItem.create!
+      Invoicing::LineItem.create! amount: 0
       Invoicing::LineItem.count.should == 5
       @invoice.destroy
       Invoicing::LineItem.count.should == 1
