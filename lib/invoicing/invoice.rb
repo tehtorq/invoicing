@@ -57,8 +57,6 @@ module Invoicing
       else
         add_debit_transaction amount: total
       end
-
-      save!
     end
 
     def credit_notes
