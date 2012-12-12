@@ -11,7 +11,7 @@ module Invoicing
     invoice = Invoice.new
     invoice.instance_eval(&block)
     invoice.save!
-    invoice.mark_items_invoiced!    
+    #invoice.mark_items_invoiced!    
     invoice
   end
 
@@ -26,6 +26,7 @@ module Invoicing
   
 end
 
+require "invoicing/state_machine"
 require "invoicing/invoiceable"
 require "invoicing/transaction"
 require "invoicing/credit_transaction"

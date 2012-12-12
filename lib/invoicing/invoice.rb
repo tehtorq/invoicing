@@ -1,5 +1,6 @@
 module Invoicing
   class Invoice < ActiveRecord::Base
+    include Invoicing::StateMachine
     has_many :line_items, dependent: :destroy
     has_many :transactions, dependent: :destroy
     has_many :payment_references, dependent: :destroy
@@ -9,8 +10,9 @@ module Invoicing
 
     validates_uniqueness_of :invoice_number, scope: [:seller_id]
   
-    before_save :calculate_totals, :calculate_balance
-    after_create :create_initial_transaction!, :set_invoice_number!
+    before_save :calculate_totals, :calculate_balance, :check_if_paid
+    #after_create :create_initial_transaction!
+    after_create :set_invoice_number!
     
     alias :decorator :invoice_decorator
     
@@ -141,6 +143,12 @@ module Invoicing
 
     def numbered(invoice_number)
       self.invoice_number = invoice_number
+    end
+
+    def check_if_paid
+      if settled? && issued?
+        self.state = "paid"
+      end   
     end
   
   end
