@@ -33,7 +33,7 @@ ActiveRecord::Schema.define do
     t.integer  "tax"
     t.integer  "balance"
     t.string   "type"
-    t.string   "state", :default => "draft"
+    t.string   "workflow_state"
     t.timestamps
   end
   

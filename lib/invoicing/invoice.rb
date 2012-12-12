@@ -1,6 +1,6 @@
 module Invoicing
   class Invoice < ActiveRecord::Base
-    include Invoicing::StateMachine
+    include ::Workflow
     has_many :line_items, dependent: :destroy
     has_many :transactions, dependent: :destroy
     has_many :payment_references, dependent: :destroy
@@ -11,10 +11,28 @@ module Invoicing
     validates_uniqueness_of :invoice_number, scope: [:seller_id]
   
     before_save :calculate_totals, :calculate_balance, :check_if_paid
-    #after_create :create_initial_transaction!
     after_create :set_invoice_number!
     
     alias :decorator :invoice_decorator
+
+    workflow do
+      state :draft do
+        event :issue, transitions_to: :issued
+      end
+      
+      state :issued do
+        event :pay, transitions_to: :paid
+        event :void, transitions_to: :voided
+      end
+
+      state :paid
+      state :voided
+    end
+
+    def issue
+      create_initial_transaction!
+      mark_items_invoiced!
+    end
     
     def add_line_item(params)
       self.line_items << LineItem.new(params)
@@ -147,7 +165,7 @@ module Invoicing
 
     def check_if_paid
       if settled? && issued?
-        self.state = "paid"
+        pay!
       end   
     end
   

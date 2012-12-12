@@ -1,4 +1,5 @@
 require "active_record"
+require "workflow"
 require "invoicing/version"
 
 module Invoicing
@@ -26,7 +27,6 @@ module Invoicing
   
 end
 
-require "invoicing/state_machine"
 require "invoicing/invoiceable"
 require "invoicing/transaction"
 require "invoicing/credit_transaction"

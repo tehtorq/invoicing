@@ -252,8 +252,8 @@ describe Invoicing::Invoice do
         @invoice.should be_draft
       end
 
-      it "should raise an error when attemptin to void an invoice in the draft state" do
-        lambda{ @invoice.void! }.should raise_error(Invoicing::StateMachine::NoTransitionAllowed, "You can only void issued invoices.")
+      it "should raise an error when attempting to void an invoice in the draft state" do
+        lambda{ @invoice.void! }.should raise_error(Workflow::NoTransitionAllowed, "There is no event void defined for the draft state")
       end
     end
 

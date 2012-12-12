@@ -34,7 +34,7 @@ class CreateInvoicingTables < ActiveRecord::Migration
       t.integer  "tax"
       t.integer  "balance"
       t.string   "type"
-      t.string   "state", :default => "draft"
+      t.string   "workflow_state"
       t.timestamps
     end
     
