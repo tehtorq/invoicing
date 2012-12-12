@@ -30,6 +30,15 @@ describe Invoicing::CreditNote do
       @invoice.reload
     end
 
+    it "should raise an exception if the invoice is not in an issued state" do
+      lambda {
+        @credit_note = Invoicing::generate_credit_note do
+          against_invoice @invoice
+        end
+      }.should raise_error(RuntimeError, "You must allocate a credit note against an invoice")
+      
+    end
+
     context "against an invoice" do
       before(:each) do
         invoice = @invoice
@@ -103,7 +112,7 @@ describe Invoicing::CreditNote do
             credit amount: 500, description: "Credit note for Line Item #{line_item.id}", tax: 0
           end
           decorate_with tenant_name: "Peter"
-        end}.to raise_error(RuntimeError, "You must allocate a credit note against an invoice.")
+        end}.to raise_error(RuntimeError, "You must allocate a credit note against an invoice")
       end
     end
 

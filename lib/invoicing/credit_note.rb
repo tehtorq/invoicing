@@ -13,7 +13,9 @@ module Invoicing
     end
 
     def record_transaction_against_invoice!
-      raise RuntimeError, "You must allocate a credit note against an invoice." if invoice.blank?
+      raise RuntimeError, "You must allocate a credit note against an invoice" if invoice.blank?
+      raise RuntimeError, "You must allocate a credit note against an issued invoice" unless invoice.issued?
+
       invoice.add_credit_transaction(amount: total)
       invoice.save!
       CreditNoteCreditTransaction.create!(transaction: invoice.transactions.last, credit_note_id: self.id)
@@ -29,6 +31,9 @@ module Invoicing
     end
 
     def against_invoice(invoice)
+      raise RuntimeError, "You must allocate a credit note against an invoice" if invoice.blank?
+      raise RuntimeError, "You must allocate a credit note against an issued invoice" unless invoice.issued?
+      
       self.credit_note_invoice = CreditNoteInvoice.new(invoice_id: invoice.id)
     end
 
