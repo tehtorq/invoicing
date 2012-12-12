@@ -15,6 +15,8 @@ describe Invoicing::CreditNote do
       payment_reference "REF123"
       decorate_with tenant_name: "Peter"
     end
+
+    @invoice.issue!
   end
 
   context "when recording a credit note" do

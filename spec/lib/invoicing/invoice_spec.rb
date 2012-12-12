@@ -31,27 +31,60 @@ describe Invoicing::Invoice do
   it "should have a total matching the sum of its line item amounts" do
     @invoice.total.should == 28212
   end
+
+  context "an issued invoice" do
+
+    before(:each) do
+      @invoice.issue!
+    end
   
-  # it "should create a debit transaction with an amount matching the sum of its line item amounts" do
-  #   @invoice.transactions.length.should == 1
-  #   @invoice.transactions.first.debit?
-  #   @invoice.transactions.first.amount.should == 28212
-  # end
-  
-  # it "should be able to calculate its balance as the sum of its credit and debit transactions" do
-  #   @invoice.balance.should == -28212
-  # end
-  
-  # it "should be considered as settled if its balance is zero" do
-  #   @invoice.balance.should_not be_zero
-  #   @invoice.settled?.should be_false
+    it "should create a debit transaction with an amount matching the sum of its line item amounts" do
+      @invoice.transactions.length.should == 1
+      @invoice.transactions.first.debit?
+      @invoice.transactions.first.amount.should == 28212
+    end
     
-  #   @invoice.add_credit_transaction amount: 28212
-  #   @invoice.save!
+    it "should be able to calculate its balance as the sum of its credit and debit transactions" do
+      @invoice.balance.should == -28212
+    end
     
-  #   @invoice.balance.should be_zero
-  #   @invoice.settled?.should be_true
-  # end
+    it "should be considered as settled if its balance is zero" do
+      @invoice.balance.should_not be_zero
+      @invoice.settled?.should be_false
+      
+      @invoice.add_credit_transaction amount: 28212
+      @invoice.save!
+      
+      @invoice.balance.should be_zero
+      @invoice.settled?.should be_true
+    end
+
+    it "should report as overdue if it is not settled and the due date has past" do
+      @invoice.due_date = Date.today - 1.days
+      @invoice.save!
+      
+      @invoice.overdue?.should be_true
+    end
+    
+    it "should not report as overdue if the invoice has been settled" do
+      @invoice.add_credit_transaction amount: 28212
+      @invoice.due_date = Date.today - 1.days
+      @invoice.save!
+      
+      @invoice.overdue?.should be_false
+    end
+    
+    it "should find all invoices which are owing" do
+      invoice = Invoicing::generate do
+        line_item description: "Line Item 1", amount: 1101
+      end
+
+      invoice.issue!
+      
+      Invoicing::Invoice.owing.count.should == 2    
+    end
+
+  end
 
   context "specifying an invoice number" do
   
@@ -109,29 +142,6 @@ describe Invoicing::Invoice do
       }.to_not raise_error
     end
 
-  end
-  
-  it "should report as overdue if it is not settled and the due date has past" do
-    @invoice.due_date = Date.today - 1.days
-    @invoice.save!
-    
-    @invoice.overdue?.should be_true
-  end
-  
-  it "should not report as overdue if the invoice has been settled" do
-    @invoice.add_credit_transaction amount: 28212
-    @invoice.due_date = Date.today - 1.days
-    @invoice.save!
-    
-    @invoice.overdue?.should be_false
-  end
-  
-  it "should find all invoices which are owing" do
-    invoice = Invoicing::generate do
-      line_item description: "Line Item 1", amount: 1101
-    end
-    
-    Invoicing::Invoice.owing.count.should == 2    
   end
   
   it "should be able to register multiple payment references to look up invoices by" do
@@ -196,10 +206,6 @@ describe Invoicing::Invoice do
 
   context "destroying an invoice" do
 
-    before(:each) do
-      
-    end
-
     it "should destroy its associated line items" do
       Invoicing::LineItem.create! amount: 0
       Invoicing::LineItem.count.should == 5
@@ -208,6 +214,7 @@ describe Invoicing::Invoice do
     end
 
     it "should destroy its associated transactions" do
+      @invoice.issue!
       Invoicing::Transaction.create!
       Invoicing::Transaction.count.should == 2
       @invoice.destroy

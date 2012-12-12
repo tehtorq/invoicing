@@ -23,6 +23,7 @@ describe Invoicing::OverdueInvoice do
       line_item description: "Line Item 1", amount: 0
     end
     
+    Invoicing::Invoice.all.each(&:issue!)
     Invoicing::OverdueInvoice.all.count.should == 1
   end
   
@@ -42,6 +43,7 @@ describe Invoicing::OverdueInvoice do
       line_item description: "Line Item 1", amount: 0
     end
     
+    Invoicing::Invoice.all.each(&:issue!)
     Invoicing::OverdueInvoice.record_late_payments!
     
     Invoicing::LatePayment.count.should == 1
@@ -55,6 +57,8 @@ describe Invoicing::OverdueInvoice do
       due Time.now - 1.days
       line_item description: "Line Item 1", amount: 1101
     end
+
+    Invoicing::Invoice.all.each(&:issue!)
     
     Invoicing::OverdueInvoice.record_late_payments!
     invoice.late_payment.penalty_date.should == Date.today.to_time + 7.days
