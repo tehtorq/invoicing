@@ -6,6 +6,12 @@ module Invoicing
     has_one :invoice, through: :credit_note_invoice
     has_many :credit_note_credit_transactions, dependent: :destroy
 
+    def issue
+      create_initial_transaction!
+      record_transaction_against_invoice!
+      record_credit_notes!
+    end
+
     def record_transaction_against_invoice!
       raise RuntimeError, "You must allocate a credit note against an invoice." if invoice.blank?
       invoice.add_credit_transaction(amount: total)

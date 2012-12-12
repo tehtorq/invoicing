@@ -46,6 +46,10 @@ describe Invoicing::CreditNote do
         @invoice.reload
       end
 
+      it "should be issued" do
+        @credit_note.should be_issued
+      end
+
       it "should have a receipt number" do
         @credit_note.receipt_number.should == "CN#{@credit_note.id}"
       end

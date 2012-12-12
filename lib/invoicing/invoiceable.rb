@@ -1,3 +1,5 @@
+# implement this module and override behaviour on items which will be invoiced
+
 module Invoicing
   module Invoiceable
   
@@ -16,12 +18,12 @@ module Invoicing
     end
 
     def handle_credit(amount)
-      self.amount = amount
     end
 
-    def mark_invoiced(invoice_id)
-      self.invoice_id = invoice_id
-      self.invoiced = true
+    def mark_invoiced(invoice)
+    end
+
+    def mark_uninvoiced
     end
   
   end

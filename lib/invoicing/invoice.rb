@@ -10,7 +10,7 @@ module Invoicing
 
     validates_uniqueness_of :invoice_number, scope: [:seller_id]
   
-    before_save :calculate_totals, :calculate_balance, :check_if_paid
+    before_save :calculate_totals, :calculate_balance
     after_create :set_invoice_number!
     
     alias :decorator :invoice_decorator
@@ -21,17 +21,21 @@ module Invoicing
       end
       
       state :issued do
-        event :pay, transitions_to: :paid
+        event :settle, transitions_to: :settled
         event :void, transitions_to: :voided
       end
 
-      state :paid
+      state :settled
       state :voided
     end
 
     def issue
       create_initial_transaction!
       mark_items_invoiced!
+    end
+
+    def void
+      mark_items_uninvoiced!
     end
     
     def add_line_item(params)
@@ -83,13 +87,18 @@ module Invoicing
       
     def calculate_balance
       self.balance = (0 - debit_transactions.sum(&:amount)) + credit_transactions.sum(&:amount)
+      settle! if should_settle?
+    end
+
+    def should_settle?
+      issued? && balance_zero?
     end
     
     def net_total
       total - tax
     end
-      
-    def settled?
+
+    def balance_zero?
       balance == 0
     end
       
@@ -108,6 +117,22 @@ module Invoicing
     def self.owing
       where("balance < ?", 0)
     end
+
+    def self.issued
+      where(workflow_state: "issued")
+    end
+
+    def self.draft
+      where(workflow_state: "draft")
+    end
+
+    def self.settled
+      where(workflow_state: "settled")
+    end
+
+    def self.voided
+      where(workflow_state: "voided")
+    end
     
     def add_payment_reference(params)
       self.payment_references << PaymentReference.new(params)
@@ -119,8 +144,13 @@ module Invoicing
     
     def mark_items_invoiced!
       line_items.map(&:invoiceable).compact.each do |item|
-        item.mark_invoiced(id)
-        item.save!
+        item.mark_invoiced(self) if item.respond_to?(:mark_invoiced)
+      end
+    end
+
+    def mark_items_uninvoiced!
+      line_items.map(&:invoiceable).compact.each do |item|
+        item.mark_uninvoiced(self) if item.respond_to?(:mark_uninvoiced)
       end
     end
     
@@ -159,12 +189,6 @@ module Invoicing
 
     def numbered(invoice_number)
       self.invoice_number = invoice_number
-    end
-
-    def check_if_paid
-      if settled? && issued?
-        pay!
-      end   
     end
   
   end

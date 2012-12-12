@@ -73,15 +73,88 @@ describe Invoicing::Invoice do
       
       @invoice.overdue?.should be_false
     end
-    
-    it "should find all invoices which are owing" do
-      invoice = Invoicing::generate do
+
+  end
+
+  context "searching for sets of invoices" do
+
+    before(:each) do
+      tear_it_down
+    end
+
+    it "should find draft invoices" do
+      issued_invoice = Invoicing::generate do
         line_item description: "Line Item 1", amount: 1101
       end
 
-      invoice.issue!
+      issued_invoice.issue!
+
+      draft_invoice = Invoicing::generate do
+        line_item description: "Line Item 1", amount: 1101
+      end
       
-      Invoicing::Invoice.owing.count.should == 2    
+      Invoicing::Invoice.draft.count.should == 1
+      Invoicing::Invoice.draft.first.should == draft_invoice
+    end
+
+    it "should find issued invoices" do
+      issued_invoice = Invoicing::generate do
+        line_item description: "Line Item 1", amount: 1101
+      end
+
+      issued_invoice.issue!
+
+      other_invoice = Invoicing::generate do
+        line_item description: "Line Item 1", amount: 1101
+      end
+      
+      Invoicing::Invoice.issued.count.should == 1
+      Invoicing::Invoice.issued.first.should == issued_invoice
+    end
+
+    it "should find owing invoices" do
+      owing_invoice = Invoicing::generate do
+        line_item description: "Line Item 1", amount: 1101
+      end
+
+      owing_invoice.issue!
+
+      other_invoice = Invoicing::generate do
+        line_item description: "Line Item 1", amount: 1101
+      end
+      
+      Invoicing::Invoice.owing.count.should == 1
+      Invoicing::Invoice.owing.first.should == owing_invoice
+    end
+
+    it "should find settled invoices" do
+      settled_invoice = Invoicing::generate do
+      end
+
+      settled_invoice.issue!
+
+      other_invoice = Invoicing::generate do
+        line_item description: "Line Item 1", amount: 1101
+      end
+      
+      Invoicing::Invoice.settled.count.should == 1
+      Invoicing::Invoice.settled.first.should == settled_invoice
+    end
+
+    it "should find voided invoices" do
+      voided_invoice = Invoicing::generate do
+        line_item description: "Line Item 1", amount: 1101
+      end
+
+      voided_invoice.issue!
+      voided_invoice.void!
+
+      other_invoice = Invoicing::generate do
+        line_item description: "Line Item 1", amount: 1101
+      end
+      
+      Invoicing::Invoice.voided.count.should == 1
+      Invoicing::Invoice.voided.first.should == voided_invoice
     end
 
   end
