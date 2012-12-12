@@ -37,12 +37,6 @@ describe Invoicing::Invoice do
     before(:each) do
       @invoice.issue!
     end
-  
-    it "should create a debit transaction with an amount matching the sum of its line item amounts" do
-      @invoice.transactions.length.should == 1
-      @invoice.transactions.first.debit?
-      @invoice.transactions.first.amount.should == 28212
-    end
     
     it "should be able to calculate its balance as the sum of its credit and debit transactions" do
       @invoice.balance.should == -28212
@@ -330,7 +324,7 @@ describe Invoicing::Invoice do
       end
     end
 
-    context "issuing the invoice" do
+    context "issueing the invoice" do
       before(:each) do
         @invoice.issue!
       end
@@ -343,21 +337,6 @@ describe Invoicing::Invoice do
         @invoice.transactions.length.should == 1
         @invoice.transactions.first.debit?
         @invoice.transactions.first.amount.should == 28212
-      end
-
-      it "should be able to calculate its balance as the sum of its credit and debit transactions" do
-        @invoice.balance.should == -28212
-      end
-
-      it "should be considered as settled if its balance is zero" do
-        @invoice.balance.should_not be_zero
-        @invoice.settled?.should be_false
-        
-        @invoice.add_credit_transaction amount: 28212
-        @invoice.save!
-        
-        @invoice.balance.should be_zero
-        @invoice.settled?.should be_true
       end
 
     end
