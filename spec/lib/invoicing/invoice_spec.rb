@@ -319,12 +319,18 @@ describe Invoicing::Invoice do
         @invoice.should be_draft
       end
 
-      it "should raise an error when attempting to void an invoice in the draft state" do
-        lambda{ @invoice.void! }.should raise_error(Workflow::NoTransitionAllowed, "There is no event void defined for the draft state")
+      context "voiding a drafted invoice" do
+        before(:each) do
+          @invoice.void!
+        end
+
+        it "should be marked as a voided invoice" do
+          @invoice.should be_voided
+        end
       end
     end
 
-    context "issueing the invoice" do
+    context "issuing the invoice" do
       before(:each) do
         @invoice.issue!
       end
@@ -339,8 +345,67 @@ describe Invoicing::Invoice do
         @invoice.transactions.first.amount.should == 28212
       end
 
+      context "voiding an issued invoice" do
+        before(:each) do
+          @invoice.void!
+        end
+
+        it "should mark the invoice as voided" do
+          @invoice.should be_voided
+        end
+
+        it "should create a credit transaction against the invoice" do
+          @invoice.credit_transactions.count.should == 1
+        end
+
+        it "should set the balance on the invoice to zero" do
+          @invoice.balance.should == 0
+        end
+
+      end
+
+      context "voiding an issued invoice with a payment recorded against it" do
+        before(:each) do
+          @invoice.add_credit_transaction amount: 1
+        end
+
+        it "should raise an error when voiding the invoice" do
+          lambda { @invoice.void! }.should raise_error(Invoicing::CannotVoidDocumentException, "Cannot void a document that has a transaction recorded against it!")
+        end
+      end
+    end
+  end
+
+  context "Hooks" do
+    before(:each) do
+      item_to_invoice = @invoice.extend(Invoicing::Invoiceable)
+      item_to_invoice.amount = 10
+        
+      @invoice2 = Invoicing::generate do
+        line_item item_to_invoice
+      end
+
+      @item_to_invoice = item_to_invoice
     end
 
+    context "issuing the invoice" do
+      it "the items to invoice should receive a mark invoice call" do
+        @item_to_invoice.should_receive(:mark_invoiced).with(@invoice2)
+        @invoice2.issue!
+      end
+    end
+
+    context "voiding the issued invoice" do
+      before(:each) do
+        @invoice2.issue!
+      end
+
+      it "the items to invoice should receive a mark uninvoiced call" do
+        @item_to_invoice.should_receive(:mark_uninvoiced).with(@invoice2)
+        @invoice2.void!
+      end
+
+    end
   end
-  
+
 end

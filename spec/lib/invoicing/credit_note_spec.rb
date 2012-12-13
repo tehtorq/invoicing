@@ -24,6 +24,8 @@ describe Invoicing::CreditNote do
       @invoice.line_items.each do |li|
         li.invoiceable = li
         li.invoiceable.extend(Invoicing::Invoiceable)
+        li.amount = 0
+        li.tax = 0
         li.save!
       end
 

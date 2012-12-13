@@ -25,6 +25,7 @@ module Invoicing
   
 end
 
+require "invoicing/exception"
 require "invoicing/invoiceable"
 require "invoicing/transaction"
 require "invoicing/credit_transaction"

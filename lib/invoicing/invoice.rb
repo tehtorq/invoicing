@@ -18,6 +18,7 @@ module Invoicing
     workflow do
       state :draft do
         event :issue, transitions_to: :issued
+        event :void, transitions_to: :voided
       end
       
       state :issued do
@@ -35,6 +36,8 @@ module Invoicing
     end
 
     def void
+      raise CannotVoidDocumentException, "Cannot void a document that has a transaction recorded against it!" if transactions.many?
+      annul_remaining_amount!
       mark_items_uninvoiced!
     end
     
@@ -53,6 +56,10 @@ module Invoicing
     def calculate_totals
       self.total = line_items.inject(0) {|res, item| res + item.amount.to_i}
       self.tax = line_items.inject(0) {|res, item| res + item.tax.to_i}
+    end
+
+    def annul_remaining_amount!
+      add_credit_transaction amount: balance.abs
     end
       
     def create_initial_transaction!
