@@ -5,8 +5,14 @@ describe Invoicing::CreditNote do
   
   before(:each) do
     tear_it_down
+
+    invoice_buyer = Invoicing::DebitTransaction.create!
+    invoice_seller = Invoicing::DebitTransaction.create!
     
     @invoice = Invoicing::generate do
+      to invoice_buyer
+      from invoice_seller
+
       line_item description: "Line Item 1", amount: 1101
       line_item description: "Line Item 2", amount: 5097
       line_item description: "Line Item 3", amount: 1714
@@ -15,6 +21,9 @@ describe Invoicing::CreditNote do
       payment_reference "REF123"
       decorate_with tenant_name: "Peter"
     end
+
+    @invoice_buyer = invoice_buyer
+    @invoice_seller = invoice_seller
 
     @invoice.issue!
   end
@@ -87,6 +96,14 @@ describe Invoicing::CreditNote do
         @invoice.reload
         @invoice.credit_notes.count.should == 1
         @invoice.credit_notes.first.receipt_number.should == "CN#{@credit_note.id}"
+      end
+
+      it "should set the buyer to the invoice's buyer" do
+        @credit_note.buyer.buyerable.should == @invoice_buyer
+      end
+
+      it "should set the seller to the invoice's seller" do
+        @credit_note.seller.sellerable.should == @invoice_seller
       end
 
     end

@@ -35,6 +35,8 @@ module Invoicing
       raise RuntimeError, "You must allocate a credit note against an issued invoice" unless invoice.issued?
       
       self.credit_note_invoice = CreditNoteInvoice.new(invoice_id: invoice.id)
+      self.buyer = invoice.buyer
+      self.seller = invoice.seller
     end
 
     def record_credit_notes!
