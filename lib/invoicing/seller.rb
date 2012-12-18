@@ -4,7 +4,7 @@ module Invoicing
     belongs_to :sellerable, polymorphic: true
 
     def self.for(sellerable)
-      Seller.where(sellerable_type: sellerable.class.name, sellerable_id: sellerable.id).first || Seller.create!(sellerable_type: sellerable.type, sellerable_id: sellerable.id)
+      Seller.where(sellerable_type: sellerable.class.name, sellerable_id: sellerable.id).first || Seller.create!(sellerable_type: sellerable.class.name, sellerable_id: sellerable.id)
     end
   end
 end

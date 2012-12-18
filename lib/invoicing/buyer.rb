@@ -4,7 +4,7 @@ module Invoicing
     belongs_to :buyerable, polymorphic: true
 
     def self.for(buyerable)
-      Buyer.where(buyerable_type: buyerable.class.name, buyerable_id: buyerable.id).first || Buyer.create!(buyerable_type: buyerable.type, buyerable_id: buyerable.id)
+      Buyer.where(buyerable_type: buyerable.class.name, buyerable_id: buyerable.id).first || Buyer.create!(buyerable_type: buyerable.class.name, buyerable_id: buyerable.id)
     end
   end
 end
