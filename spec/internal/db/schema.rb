@@ -27,6 +27,7 @@ ActiveRecord::Schema.define do
   
   create_table "invoicing_invoices", :force => true do |t|
     t.integer  "seller_id"
+    t.integer  "buyer_id"
     t.string   "invoice_number"
     t.datetime "due_date"
     t.integer  "total"
@@ -44,6 +45,14 @@ ActiveRecord::Schema.define do
   end
   
   create_table "invoicing_sellers", :force => true do |t|
+    t.integer "sellerable_id"
+    t.string "sellerable_type"
+    t.timestamps
+  end
+
+  create_table "invoicing_buyers", :force => true do |t|
+    t.integer "buyerable_id"
+    t.string "buyerable_type"
     t.timestamps
   end
   

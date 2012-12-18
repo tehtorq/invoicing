@@ -176,7 +176,7 @@ describe Invoicing::Invoice do
     end
 
     it "should validate that the invoice number is unique per seller" do
-      seller = Invoicing::Seller.create!
+      seller = Invoicing::DebitTransaction.create!
 
       invoice = Invoicing::generate do
         numbered "CUSTOMREF123"
@@ -192,14 +192,14 @@ describe Invoicing::Invoice do
     end
 
     it "should allow two invoices with the same invoice number, but from different sellers" do
-      first_seller = Invoicing::Seller.create!
+      first_seller = Invoicing::DebitTransaction.create!
 
       invoice = Invoicing::generate do
         numbered "CUSTOMREF123"
         from first_seller
       end
 
-      second_seller = Invoicing::Seller.create!
+      second_seller = Invoicing::DebitTransaction.create!
 
       expect {
         invoice = Invoicing::generate do
@@ -221,13 +221,13 @@ describe Invoicing::Invoice do
   end
   
   it "should be able to specify the seller" do
-    seller = Invoicing::Seller.create!
+    seller = Invoicing::DebitTransaction.create!
     
     invoice = Invoicing::generate do
       from seller
     end
     
-    invoice.seller.should == seller
+    invoice.seller.sellerable.should == seller
   end
   
   it "should be able to find invoices for a given reference" do

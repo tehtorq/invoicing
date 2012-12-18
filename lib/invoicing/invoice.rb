@@ -6,6 +6,7 @@ module Invoicing
     has_many :payment_references, dependent: :destroy
     has_one :late_payment, dependent: :destroy
     belongs_to :seller
+    belongs_to :buyer
     has_one :invoice_decorator, dependent: :destroy
 
     validates_uniqueness_of :invoice_number, scope: [:seller_id]
@@ -185,9 +186,13 @@ module Invoicing
     def due(due_date)
       self.due_date = due_date
     end
+
+    def to(buyerable)
+      self.buyer = Buyer.for(buyerable)
+    end
     
-    def from(seller)
-      self.seller = seller
+    def from(sellerable)
+      self.seller = Seller.for(sellerable)
     end
     
     def decorate_with(decorations)
