@@ -68,6 +68,10 @@ describe Invoicing::Invoice do
       @invoice.overdue?.should be_false
     end
 
+    it "should record the issued time" do
+      @invoice.issued_at.to_date.should == Date.today
+    end
+
   end
 
   context "searching for sets of invoices" do

@@ -31,7 +31,8 @@ module Invoicing
       state :voided
     end
 
-    def issue
+    def issue(issued_at = Time.now)
+      self.issued_at = issued_at
       create_initial_transaction!
       mark_items_invoiced!
     end

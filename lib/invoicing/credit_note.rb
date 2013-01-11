@@ -6,7 +6,8 @@ module Invoicing
     has_one :invoice, through: :credit_note_invoice
     has_many :credit_note_credit_transactions, dependent: :destroy
 
-    def issue
+    def issue(issued_at = Time.now)
+      self.issued_at = issued_at
       create_initial_transaction!
       record_transaction_against_invoice!
       record_credit_notes!

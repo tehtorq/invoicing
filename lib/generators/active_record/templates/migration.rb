@@ -31,6 +31,7 @@ class CreateInvoicingTables < ActiveRecord::Migration
       t.integer  "buyer_id"
       t.string   "invoice_number"
       t.datetime "due_date"
+      t.datetime "issued_at"
       t.integer  "total"
       t.integer  "tax"
       t.integer  "balance"
