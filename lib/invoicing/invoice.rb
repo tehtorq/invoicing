@@ -45,6 +45,10 @@ module Invoicing
     def add_line_item(params)
       self.line_items << LineItem.new(params)
     end
+
+    def remove_line_item(item)
+      line_items.delete(item)
+    end
     
     def add_debit_transaction(params)
       self.transactions << DebitTransaction.new(params)
@@ -145,6 +149,10 @@ module Invoicing
     def add_payment_reference(params)
       self.payment_references << PaymentReference.new(params)
     end
+
+    def remove_payment_reference(payment_reference)
+      payment_references.delete(payment_reference)
+    end
     
     def self.for_payment_reference(reference)
       PaymentReference.where(reference: reference).map(&:invoice)
@@ -196,12 +204,24 @@ module Invoicing
     end
     
     def decorate_with(decorations)
-      self.invoice_decorator = InvoiceDecorator.new data: decorations
+      if self.invoice_decorator
+        self.invoice_decorator.data = decorations
+      else
+        self.invoice_decorator = InvoiceDecorator.new(data: decorations)
+      end
     end
 
     def numbered(invoice_number)
       self.invoice_number = invoice_number
     end
+
+    def adjust(&block)
+      adjustment = InvoiceAdjustment.new(self)
+      adjustment.instance_eval(&block)
+      adjustment.persist!
+      adjustment.invoice
+    end
   
   end
+
 end
