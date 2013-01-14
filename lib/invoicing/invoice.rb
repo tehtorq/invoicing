@@ -176,14 +176,16 @@ module Invoicing
         add_line_item(
           amount: cost_item[:amount] || 0,
           tax: cost_item[:tax] || 0,
-          description: cost_item[:description] || 'Line Item'
+          description: cost_item[:description] || 'Line Item',
+          line_item_type_id: cost_item[:line_item_type_id]
         )
       else
         add_line_item(
           invoiceable: cost_item,
           amount: cost_item.amount || 0,
           tax: cost_item.tax || 0,
-          description: cost_item.description || 'Line Item'
+          description: cost_item.description || 'Line Item',
+          line_item_type_id: cost_item.respond_to?(line_item_type_id) ? cost_item.line_item_type_id : nil
         )
       end
     end

@@ -15,6 +15,7 @@ ActiveRecord::Schema.define do
     t.integer "tax"
     t.integer "invoiceable_id"
     t.string "invoiceable_type"
+    t.integer "line_item_type_id"
     t.timestamps
   end
   
@@ -71,6 +72,10 @@ ActiveRecord::Schema.define do
   create_table "invoicing_credit_note_credit_transactions", :force => true do |t|
     t.integer "credit_note_id"
     t.integer "transaction_id"
+  end
+
+  create_table "invoicing_line_item_types", :force => true do |t|
+    t.string "name"
   end
   
 end
