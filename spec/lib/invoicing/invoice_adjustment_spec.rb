@@ -11,9 +11,9 @@ describe Invoicing::InvoiceAdjustment do
     @invoice = Invoicing::generate do
       to buyer
 
-      line_item description: "Line Item 1", amount: 1101
-      line_item description: "Line Item 2", amount: 5097
-      line_item description: "Line Item 3", amount: 1714
+      line_item description: "Line Item 1", amount: 1101, line_item_type_id: 1
+      line_item description: "Line Item 2", amount: 5097, line_item_type_id: 1
+      line_item description: "Line Item 3", amount: 1714, line_item_type_id: 1
 
       payment_reference "REF123"
       decorate_with tenant_name: "Peter"

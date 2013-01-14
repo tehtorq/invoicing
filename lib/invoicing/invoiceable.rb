@@ -3,7 +3,7 @@
 module Invoicing
   module Invoiceable
   
-    attr_accessor :invoiced, :invoice_id, :amount, :tax
+    attr_accessor :invoiced, :invoice_id, :amount, :tax, :line_item_type_id
 
     def description
       "Invoiceable Item"

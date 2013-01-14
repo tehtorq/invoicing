@@ -7,10 +7,10 @@ describe Invoicing::Invoice do
     tear_it_down
     
     @invoice = Invoicing::generate do
-      line_item description: "Line Item 1", amount: 1101
-      line_item description: "Line Item 2", amount: 5097
-      line_item description: "Line Item 3", amount: 1714
-      line_item description: "Line Item 4", amount: 20300
+      line_item description: "Line Item 1", amount: 1101, line_item_type_id: 1
+      line_item description: "Line Item 2", amount: 5097, line_item_type_id: 1
+      line_item description: "Line Item 3", amount: 1714, line_item_type_id: 1
+      line_item description: "Line Item 4", amount: 20300, line_item_type_id: 1
 
       payment_reference "REF123"
       decorate_with tenant_name: "Peter"
@@ -19,7 +19,7 @@ describe Invoicing::Invoice do
   
   it "should be able to add a line item" do
     invoice = Invoicing::generate do
-      line_item description: "Line Item 1", amount: 1101
+      line_item description: "Line Item 1", amount: 1101, line_item_type_id: 1
     end
     
     line_items = invoice.line_items
@@ -82,13 +82,13 @@ describe Invoicing::Invoice do
 
     it "should find draft invoices" do
       issued_invoice = Invoicing::generate do
-        line_item description: "Line Item 1", amount: 1101
+        line_item description: "Line Item 1", amount: 1101, line_item_type_id: 1
       end
 
       issued_invoice.issue!
 
       draft_invoice = Invoicing::generate do
-        line_item description: "Line Item 1", amount: 1101
+        line_item description: "Line Item 1", amount: 1101, line_item_type_id: 1, line_item_type_id: 1
       end
       
       Invoicing::Invoice.draft.count.should == 1
@@ -97,13 +97,13 @@ describe Invoicing::Invoice do
 
     it "should find issued invoices" do
       issued_invoice = Invoicing::generate do
-        line_item description: "Line Item 1", amount: 1101
+        line_item description: "Line Item 1", amount: 1101, line_item_type_id: 1
       end
 
       issued_invoice.issue!
 
       other_invoice = Invoicing::generate do
-        line_item description: "Line Item 1", amount: 1101
+        line_item description: "Line Item 1", amount: 1101, line_item_type_id: 1
       end
       
       Invoicing::Invoice.issued.count.should == 1
@@ -112,13 +112,13 @@ describe Invoicing::Invoice do
 
     it "should find owing invoices" do
       owing_invoice = Invoicing::generate do
-        line_item description: "Line Item 1", amount: 1101
+        line_item description: "Line Item 1", amount: 1101, line_item_type_id: 1
       end
 
       owing_invoice.issue!
 
       other_invoice = Invoicing::generate do
-        line_item description: "Line Item 1", amount: 1101
+        line_item description: "Line Item 1", amount: 1101, line_item_type_id: 1
       end
       
       Invoicing::Invoice.owing.count.should == 1
@@ -132,7 +132,7 @@ describe Invoicing::Invoice do
       settled_invoice.issue!
 
       other_invoice = Invoicing::generate do
-        line_item description: "Line Item 1", amount: 1101
+        line_item description: "Line Item 1", amount: 1101, line_item_type_id: 1
       end
       
       Invoicing::Invoice.settled.count.should == 1
@@ -141,14 +141,14 @@ describe Invoicing::Invoice do
 
     it "should find voided invoices" do
       voided_invoice = Invoicing::generate do
-        line_item description: "Line Item 1", amount: 1101
+        line_item description: "Line Item 1", amount: 1101, line_item_type_id: 1
       end
 
       voided_invoice.issue!
       voided_invoice.void!
 
       other_invoice = Invoicing::generate do
-        line_item description: "Line Item 1", amount: 1101
+        line_item description: "Line Item 1", amount: 1101, line_item_type_id: 1
       end
       
       Invoicing::Invoice.voided.count.should == 1
