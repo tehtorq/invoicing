@@ -31,12 +31,13 @@ module Invoicing
       state :voided
     end
 
-    def issue(issued_at = Time.now)
-      self.issued_at = issued_at
+    def issue(&block)
+      self.issued_at = Time.now
+      instance_eval(&block) if block_given?
       create_initial_transaction!
       mark_items_invoiced!
     end
-
+    
     def void
       raise CannotVoidDocumentException, "Cannot void a document that has a transaction recorded against it!" if transactions.many?
       annul_remaining_amount!
