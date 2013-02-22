@@ -36,12 +36,14 @@ module Invoicing
       instance_eval(&block) if block_given?
       create_initial_transaction!
       mark_items_invoiced!
+      self
     end
     
     def void
       raise CannotVoidDocumentException, "Cannot void a document that has a transaction recorded against it!" if transactions.many?
       annul_remaining_amount!
       mark_items_uninvoiced!
+      self
     end
     
     def add_line_item(params)
