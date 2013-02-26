@@ -76,6 +76,21 @@ describe Invoicing::InvoiceAdjustment do
       @invoice.total.should == 7912
     end
 
+    it "should allow line items to be edited" do
+      line_item = @invoice.line_items.first
+      item_to_invoice = @invoice.extend(Invoicing::Invoiceable)
+
+      @invoice.adjust do
+        edit_line_item(line_item, {description: "Modified Line Item", amount: 500})
+      end
+
+      @invoice.line_items.count.should == 3
+      @invoice.total.should == 7311
+
+      line_item.description.should == "Modified Line Item"
+      line_item.amount.should == 500
+    end
+
     it "should allow line items to be removed" do
       @invoice.line_items.count.should == 3
 
