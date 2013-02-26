@@ -9,5 +9,9 @@ module Invoicing
     def net_amount
       amount - tax
     end
+
+    def self.for(item)
+      where(id: item.id).first
+    end
   end
 end

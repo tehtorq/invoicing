@@ -19,7 +19,7 @@ module Invoicing
 
     def edit_line_item(item, params)
       raise CannotEditNonExistantLineItem if invoice.line_items.find(item.id).blank?
-      item.assign_attributes(params)
+      self.invoice.line_items.for(item).update_attributes(params)
     end
 
     def remove_line_item(item)
@@ -43,6 +43,7 @@ module Invoicing
     end
 
     def persist!
+      self.invoice.line_items.map(&:reload)
       self.invoice.save!
     end
   end
