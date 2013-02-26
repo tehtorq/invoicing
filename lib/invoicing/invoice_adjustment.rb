@@ -43,8 +43,12 @@ module Invoicing
     end
 
     def persist!
-      self.invoice.line_items.map(&:reload)
-      self.invoice.save!
+      # this method makes me a little sad.
+      self.invoice.transaction do 
+        self.invoice.invoice_decorator.save
+        self.invoice.line_items.map(&:reload)
+        self.invoice.save!
+      end
     end
   end
 

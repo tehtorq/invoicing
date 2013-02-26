@@ -61,6 +61,8 @@ describe Invoicing::InvoiceAdjustment do
         decorate_with decorations
       end
 
+      # @invoice.reload
+
       @invoice.decorator.data.should == decorations
     end
 
@@ -88,7 +90,7 @@ describe Invoicing::InvoiceAdjustment do
       @invoice.total.should == 7311
 
       line_item.reload
-      
+
       line_item.description.should == "Modified Line Item"
       line_item.amount.should == 500
     end
