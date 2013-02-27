@@ -10,6 +10,7 @@ describe Invoicing::InvoiceAdjustment do
     
     @invoice = Invoicing::generate do
       to buyer
+      numbered "INV123"
 
       line_item description: "Line Item 1", amount: 1101, line_item_type_id: 1
       line_item description: "Line Item 2", amount: 5097, line_item_type_id: 1
@@ -106,6 +107,16 @@ describe Invoicing::InvoiceAdjustment do
       @invoice.total.should == 6811
     end
 
+  end
+
+  context "Adjusting an Invoice Number" do
+    it "should allow the invoice number to be updated" do
+      @invoice.adjust do
+        numbered "DRAFT-INV123"
+      end
+
+      @invoice.invoice_number.should == "DRAFT-INV123"
+    end
   end
 
   context "adjusting an issued invoice" do

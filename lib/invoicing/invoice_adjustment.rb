@@ -38,6 +38,10 @@ module Invoicing
       invoice.to(buyerable)
     end
 
+    def numbered(invoice_number)
+      invoice.numbered(invoice_number)
+    end
+
     def decorate_with(decorations)
       invoice.decorate_with(decorations)
     end
