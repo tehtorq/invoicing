@@ -7,5 +7,4 @@ group :development do
   gem 'rspec'
   gem 'rspec-rails'
   gem 'sqlite3'
-  gem 'railroady'
 end
