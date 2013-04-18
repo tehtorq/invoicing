@@ -37,7 +37,7 @@ describe Invoicing::Invoice do
     before(:each) do
       @invoice.issue!
     end
-    
+
     it "should be able to calculate its balance as the sum of its credit and debit transactions" do
       @invoice.balance.should == -28212
     end
@@ -330,6 +330,10 @@ describe Invoicing::Invoice do
 
         it "should be marked as a voided invoice" do
           @invoice.should be_voided
+        end
+
+        it "should not create a credit transaction against the draft invoice" do
+          @invoice.transactions.should be_blank
         end
       end
     end

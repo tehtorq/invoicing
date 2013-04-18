@@ -41,7 +41,7 @@ module Invoicing
     
     def void
       raise CannotVoidDocumentException, "Cannot void a document that has a transaction recorded against it!" if transactions.many?
-      annul_remaining_amount!
+      annul_remaining_amount! unless self.draft?
       mark_items_uninvoiced!
       self
     end
