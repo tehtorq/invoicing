@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.summary     = %q{ An invoicing gem. }
   s.description = %q{ Manage invoices. }
 
-  s.rubyforge_project = "invoicing"
+  s.rubyforge_project = "uomi"
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
@@ -21,7 +21,7 @@ Gem::Specification.new do |s|
   s.add_dependency "activesupport"
   s.add_dependency "activerecord", "~> 3.0"
   s.add_dependency "i18n"
-  s.add_dependency "workflow"
+  s.add_dependency "workflow", '= 0.8.7'
   
   s.add_development_dependency 'combustion', '~> 0.3.1'
 end
