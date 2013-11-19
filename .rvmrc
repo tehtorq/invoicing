@@ -1,1 +1,1 @@
-rvm use 1.9.2@invoicing --create
+rvm use 1.9.2@uomi --create

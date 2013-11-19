@@ -1,14 +1,14 @@
 require 'spec_helper'
 
-describe Invoicing::InvoiceAdjustment do
+describe Uomi::InvoiceAdjustment do
   include Helpers
   
   before(:each) do
     tear_it_down
 
-    buyer = Invoicing::DebitTransaction.create!
+    buyer = Uomi::DebitTransaction.create!
     
-    @invoice = Invoicing::generate do
+    @invoice = Uomi::generate_invoice do
       to buyer
       numbered "INV123"
 
@@ -30,7 +30,7 @@ describe Invoicing::InvoiceAdjustment do
     end
 
     it "should allow the buyer to be changed" do
-      new_buyer = Invoicing::DebitTransaction.create!
+      new_buyer = Uomi::DebitTransaction.create!
 
       @invoice.adjust do
         to new_buyer
@@ -68,7 +68,7 @@ describe Invoicing::InvoiceAdjustment do
     end
 
     it "should allow line items to be added" do
-      item_to_invoice = @invoice.extend(Invoicing::Invoiceable)
+      item_to_invoice = @invoice.extend(Uomi::Invoiceable)
       @invoice.line_items.count.should == 3
 
       @invoice.adjust do
@@ -81,7 +81,7 @@ describe Invoicing::InvoiceAdjustment do
 
     it "should allow line items to be edited" do
       line_item = @invoice.line_items.first
-      item_to_invoice = @invoice.extend(Invoicing::Invoiceable)
+      item_to_invoice = @invoice.extend(Uomi::Invoiceable)
 
       @invoice.adjust do
         edit_line_item(line_item, {description: "Modified Line Item", amount: 500})
@@ -128,7 +128,7 @@ describe Invoicing::InvoiceAdjustment do
         @invoice.adjust do
           due Date.tomorrow
         end
-      }.to raise_error(Invoicing::CannotAdjustIssuedDocument)
+      }.to raise_error(Uomi::CannotAdjustIssuedDocument)
     end
 
   end

@@ -1,4 +1,4 @@
-module Invoicing
+module Uomi
   class LatePayment < ActiveRecord::Base
     belongs_to :invoice
   

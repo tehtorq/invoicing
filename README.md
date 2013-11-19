@@ -1,5 +1,5 @@
 
-[![Build Status](https://secure.travis-ci.org/tehtorq/invoicing.png)](http://travis-ci.org/tehtorq/invoicing)
+[![Build Status](https://secure.travis-ci.org/tehtorq/uomi.png)](http://travis-ci.org/tehtorq/uomi)
 
 Basic Usage
 
@@ -7,7 +7,7 @@ Basic Usage
     book = Book.find(1) # implements CostItem
     decorations = {whatever_you_want: 'here'}
 
-    invoice = Invoicing::generate do
+    invoice = Uomi::generate_invoice do
       from seller
       line_item book
       due Time.now + 7.days
@@ -21,13 +21,13 @@ A default invoice number will be set with the format INV[invoice id].
 
 A custom invoice number can be specified as follows:
 
-    invoice = Invoicing::generate do
+    invoice = Uomi::generate_invoice do
       numbered "CUSTOMREF123"
     end
 
 You can specify a custom invoice number containing the invoice id as follows:
 
-    invoice = Invoicing::generate do
+    invoice = Uomi::generate_invoice do
       numbered "CUSTOMREF{id}"
     end
 

@@ -1,12 +1,12 @@
 require 'spec_helper'
 
-describe Invoicing::Invoice do
+describe Uomi::Invoice do
   include Helpers
   
   before(:each) do
     tear_it_down
     
-    @invoice = Invoicing::generate do
+    @invoice = Uomi::generate_invoice do
       line_item description: "Line Item 1", amount: 1101, line_item_type_id: 1
       line_item description: "Line Item 2", amount: 5097, line_item_type_id: 1
       line_item description: "Line Item 3", amount: 1714, line_item_type_id: 1
@@ -18,7 +18,7 @@ describe Invoicing::Invoice do
   end
   
   it "should be able to add a line item" do
-    invoice = Invoicing::generate do
+    invoice = Uomi::generate_invoice do
       line_item description: "Line Item 1", amount: 1101, line_item_type_id: 1
     end
     
@@ -81,78 +81,78 @@ describe Invoicing::Invoice do
     end
 
     it "should find draft invoices" do
-      issued_invoice = Invoicing::generate do
+      issued_invoice = Uomi::generate_invoice do
         line_item description: "Line Item 1", amount: 1101, line_item_type_id: 1
       end
 
       issued_invoice.issue!
 
-      draft_invoice = Invoicing::generate do
+      draft_invoice = Uomi::generate_invoice do
         line_item description: "Line Item 1", amount: 1101, line_item_type_id: 1, line_item_type_id: 1
       end
       
-      Invoicing::Invoice.draft.count.should == 1
-      Invoicing::Invoice.draft.first.should == draft_invoice
+      Uomi::Invoice.draft.count.should == 1
+      Uomi::Invoice.draft.first.should == draft_invoice
     end
 
     it "should find issued invoices" do
-      issued_invoice = Invoicing::generate do
+      issued_invoice = Uomi::generate_invoice do
         line_item description: "Line Item 1", amount: 1101, line_item_type_id: 1
       end
 
       issued_invoice.issue!
 
-      other_invoice = Invoicing::generate do
+      other_invoice = Uomi::generate_invoice do
         line_item description: "Line Item 1", amount: 1101, line_item_type_id: 1
       end
       
-      Invoicing::Invoice.issued.count.should == 1
-      Invoicing::Invoice.issued.first.should == issued_invoice
+      Uomi::Invoice.issued.count.should == 1
+      Uomi::Invoice.issued.first.should == issued_invoice
     end
 
     it "should find owing invoices" do
-      owing_invoice = Invoicing::generate do
+      owing_invoice = Uomi::generate_invoice do
         line_item description: "Line Item 1", amount: 1101, line_item_type_id: 1
       end
 
       owing_invoice.issue!
 
-      other_invoice = Invoicing::generate do
+      other_invoice = Uomi::generate_invoice do
         line_item description: "Line Item 1", amount: 1101, line_item_type_id: 1
       end
       
-      Invoicing::Invoice.owing.count.should == 1
-      Invoicing::Invoice.owing.first.should == owing_invoice
+      Uomi::Invoice.owing.count.should == 1
+      Uomi::Invoice.owing.first.should == owing_invoice
     end
 
     it "should find settled invoices" do
-      settled_invoice = Invoicing::generate do
+      settled_invoice = Uomi::generate_invoice do
       end
 
       settled_invoice.issue!
 
-      other_invoice = Invoicing::generate do
+      other_invoice = Uomi::generate_invoice do
         line_item description: "Line Item 1", amount: 1101, line_item_type_id: 1
       end
       
-      Invoicing::Invoice.settled.count.should == 1
-      Invoicing::Invoice.settled.first.should == settled_invoice
+      Uomi::Invoice.settled.count.should == 1
+      Uomi::Invoice.settled.first.should == settled_invoice
     end
 
     it "should find voided invoices" do
-      voided_invoice = Invoicing::generate do
+      voided_invoice = Uomi::generate_invoice do
         line_item description: "Line Item 1", amount: 1101, line_item_type_id: 1
       end
 
       voided_invoice.issue!
       voided_invoice.void!
 
-      other_invoice = Invoicing::generate do
+      other_invoice = Uomi::generate_invoice do
         line_item description: "Line Item 1", amount: 1101, line_item_type_id: 1
       end
       
-      Invoicing::Invoice.voided.count.should == 1
-      Invoicing::Invoice.voided.first.should == voided_invoice
+      Uomi::Invoice.voided.count.should == 1
+      Uomi::Invoice.voided.first.should == voided_invoice
     end
 
   end
@@ -164,7 +164,7 @@ describe Invoicing::Invoice do
     end
 
     it "should allow a specific invoice number to be specified" do
-      invoice = Invoicing::generate do
+      invoice = Uomi::generate_invoice do
         numbered "CUSTOMREF123"
       end
       
@@ -172,7 +172,7 @@ describe Invoicing::Invoice do
     end
 
     it "should allow a custom invoice number format to be specified containing the invoice id" do
-      invoice = Invoicing::generate do
+      invoice = Uomi::generate_invoice do
         numbered "CUSTOMREF{id}"
       end
 
@@ -180,15 +180,15 @@ describe Invoicing::Invoice do
     end
 
     it "should validate that the invoice number is unique per seller" do
-      seller = Invoicing::DebitTransaction.create!
+      seller = Uomi::DebitTransaction.create!
 
-      invoice = Invoicing::generate do
+      invoice = Uomi::generate_invoice do
         numbered "CUSTOMREF123"
         from seller
       end
 
       expect {
-        invoice = Invoicing::generate do
+        invoice = Uomi::generate_invoice do
           numbered "CUSTOMREF123"
           from seller
         end
@@ -196,17 +196,17 @@ describe Invoicing::Invoice do
     end
 
     it "should allow two invoices with the same invoice number, but from different sellers" do
-      first_seller = Invoicing::DebitTransaction.create!
+      first_seller = Uomi::DebitTransaction.create!
 
-      invoice = Invoicing::generate do
+      invoice = Uomi::generate_invoice do
         numbered "CUSTOMREF123"
         from first_seller
       end
 
-      second_seller = Invoicing::DebitTransaction.create!
+      second_seller = Uomi::DebitTransaction.create!
 
       expect {
-        invoice = Invoicing::generate do
+        invoice = Uomi::generate_invoice do
           numbered "CUSTOMREF123"
           from second_seller
         end
@@ -216,7 +216,7 @@ describe Invoicing::Invoice do
   end
   
   it "should be able to register multiple payment references to look up invoices by" do
-    invoice = Invoicing::generate do
+    invoice = Uomi::generate_invoice do
       payment_reference "Mr. Anderson"
       payment_reference "REF23934"
     end
@@ -225,9 +225,9 @@ describe Invoicing::Invoice do
   end
   
   it "should be able to specify the seller" do
-    seller = Invoicing::DebitTransaction.create!
+    seller = Uomi::DebitTransaction.create!
     
-    invoice = Invoicing::generate do
+    invoice = Uomi::generate_invoice do
       from seller
     end
     
@@ -235,26 +235,26 @@ describe Invoicing::Invoice do
   end
   
   it "should be able to find invoices for a given reference" do
-    invoice1 = Invoicing::generate do
+    invoice1 = Uomi::generate_invoice do
       payment_reference "Mr. Anderson"
       payment_reference "REF23934"
     end
     
-    invoice2 = Invoicing::generate do
+    invoice2 = Uomi::generate_invoice do
       payment_reference "Mr. Anderson"
     end
     
-    Invoicing::Invoice.for_payment_reference("Mr. Anderson").should == [invoice1, invoice2]
-    Invoicing::Invoice.for_payment_reference("REF23934").should == [invoice1]
-    Invoicing::Invoice.for_payment_reference("My Payment").should == []
+    Uomi::Invoice.for_payment_reference("Mr. Anderson").should == [invoice1, invoice2]
+    Uomi::Invoice.for_payment_reference("REF23934").should == [invoice1]
+    Uomi::Invoice.for_payment_reference("My Payment").should == []
   end
   
   context "when adding a line item" do
     
     it "should be able to attach an invoiceable item to the line item" do
-      item_to_invoice = @invoice.extend(Invoicing::Invoiceable)
+      item_to_invoice = @invoice.extend(Uomi::Invoiceable)
       
-      invoice = Invoicing::generate do
+      invoice = Uomi::generate_invoice do
         line_item item_to_invoice
       end
       
@@ -263,11 +263,11 @@ describe Invoicing::Invoice do
   end
   
   it "should be able to add decoration data to the invoice" do
-    item_to_invoice = @invoice.extend(Invoicing::Invoiceable)
+    item_to_invoice = @invoice.extend(Uomi::Invoiceable)
 
     decoration = {invoicee: "Bob Jones"}
     
-    invoice = Invoicing::generate do
+    invoice = Uomi::generate_invoice do
       line_item item_to_invoice
       decorate_with decoration
     end
@@ -278,40 +278,40 @@ describe Invoicing::Invoice do
   context "destroying an invoice" do
 
     it "should destroy its associated line items" do
-      Invoicing::LineItem.create! amount: 0
-      Invoicing::LineItem.count.should == 5
+      Uomi::LineItem.create! amount: 0
+      Uomi::LineItem.count.should == 5
       @invoice.destroy
-      Invoicing::LineItem.count.should == 1
+      Uomi::LineItem.count.should == 1
     end
 
     it "should destroy its associated transactions" do
       @invoice.issue!
-      Invoicing::Transaction.create!
-      Invoicing::Transaction.count.should == 2
+      Uomi::Transaction.create!
+      Uomi::Transaction.count.should == 2
       @invoice.destroy
-      Invoicing::Transaction.count.should == 1
+      Uomi::Transaction.count.should == 1
     end
 
     it "should destroy its associated payment_references" do
-      Invoicing::PaymentReference.create!
-      Invoicing::PaymentReference.count.should == 2
+      Uomi::PaymentReference.create!
+      Uomi::PaymentReference.count.should == 2
       @invoice.destroy
-      Invoicing::PaymentReference.count.should == 1
+      Uomi::PaymentReference.count.should == 1
     end
 
     it "should destroy its associated late payments" do
-      Invoicing::LatePayment.create!
-      Invoicing::LatePayment.create! invoice_id: @invoice.id
-      Invoicing::LatePayment.count.should == 2
+      Uomi::LatePayment.create!
+      Uomi::LatePayment.create! invoice_id: @invoice.id
+      Uomi::LatePayment.count.should == 2
       @invoice.destroy
-      Invoicing::LatePayment.count.should == 1
+      Uomi::LatePayment.count.should == 1
     end
 
     it "should destroy its associated decorator" do
-      Invoicing::InvoiceDecorator.create!
-      Invoicing::InvoiceDecorator.count.should == 2
+      Uomi::InvoiceDecorator.create!
+      Uomi::InvoiceDecorator.count.should == 2
       @invoice.destroy
-      Invoicing::InvoiceDecorator.count.should == 1
+      Uomi::InvoiceDecorator.count.should == 1
     end
 
   end
@@ -378,7 +378,7 @@ describe Invoicing::Invoice do
         end
 
         it "should raise an error when voiding the invoice" do
-          lambda { @invoice.void! }.should raise_error(Invoicing::CannotVoidDocumentException, "Cannot void a document that has a transaction recorded against it!")
+          lambda { @invoice.void! }.should raise_error(Uomi::CannotVoidDocumentException, "Cannot void a document that has a transaction recorded against it!")
         end
       end
     end
@@ -386,10 +386,10 @@ describe Invoicing::Invoice do
 
   context "Hooks" do
     before(:each) do
-      item_to_invoice = @invoice.extend(Invoicing::Invoiceable)
+      item_to_invoice = @invoice.extend(Uomi::Invoiceable)
       item_to_invoice.amount = 10
         
-      @invoice2 = Invoicing::generate do
+      @invoice2 = Uomi::generate_invoice do
         line_item item_to_invoice
       end
 

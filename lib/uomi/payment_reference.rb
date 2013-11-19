@@ -1,4 +1,4 @@
-module Invoicing
+module Uomi
   
   class PaymentReference < ActiveRecord::Base
     

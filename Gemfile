@@ -1,6 +1,6 @@
 source "http://rubygems.org"
 
-# Specify your gem's dependencies in invoicing.gemspec
+# Specify your gem's dependencies in uomi.gemspec
 gemspec
 
 group :development do

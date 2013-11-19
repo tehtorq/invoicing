@@ -1,15 +1,15 @@
 require 'spec_helper'
 
-describe Invoicing::CreditNote do
+describe Uomi::CreditNote do
   include Helpers
   
   before(:each) do
     tear_it_down
 
-    invoice_buyer = Invoicing::DebitTransaction.create!
-    invoice_seller = Invoicing::DebitTransaction.create!
+    invoice_buyer = Uomi::DebitTransaction.create!
+    invoice_seller = Uomi::DebitTransaction.create!
     
-    @invoice = Invoicing::generate do
+    @invoice = Uomi::generate_invoice do
       to invoice_buyer
       from invoice_seller
 
@@ -32,7 +32,7 @@ describe Invoicing::CreditNote do
     before(:each) do
       @invoice.line_items.each do |li|
         li.invoiceable = li
-        li.invoiceable.extend(Invoicing::Invoiceable)
+        li.invoiceable.extend(Uomi::Invoiceable)
         li.amount = 0
         li.tax = 0
         li.save!
@@ -43,7 +43,7 @@ describe Invoicing::CreditNote do
 
     it "should raise an exception if the invoice is not in an issued state" do
       lambda {
-        @credit_note = Invoicing::generate_credit_note do
+        @credit_note = Uomi::generate_credit_note do
           against_invoice @invoice
         end
       }.should raise_error(RuntimeError, "You must allocate a credit note against an invoice")
@@ -55,7 +55,7 @@ describe Invoicing::CreditNote do
         invoice = @invoice
         line_items = invoice.line_items
 
-        @credit_note = Invoicing::generate_credit_note do
+        @credit_note = Uomi::generate_credit_note do
           line_items.each do |line_item|
             credit amount: line_item.amount, line_item: line_item, description: "Credit note for Line Item #{line_item.id}", tax: 0
           end
@@ -111,7 +111,7 @@ describe Invoicing::CreditNote do
     context "When applying credits to the invoiceables" do
 
       it "should receive handle credit for each line item being credited" do
-        credit_note = Invoicing::CreditNote.new
+        credit_note = Uomi::CreditNote.new
         credit_note.line_items = @invoice.line_items
 
         credit_note.line_items.map(&:invoiceable).compact.each do |item|
@@ -126,7 +126,7 @@ describe Invoicing::CreditNote do
     context "trying to create a standalone credit note" do
 
       it "should raise an error if no invoice is specified" do
-        expect {Invoicing::generate_credit_note do
+        expect {Uomi::generate_credit_note do
           line_items.each do |line_item|
             credit amount: 500, description: "Credit note for Line Item #{line_item.id}", tax: 0
           end

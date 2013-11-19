@@ -1,4 +1,4 @@
-module Invoicing
+module Uomi
   class Invoice < ActiveRecord::Base
     include ::Workflow
     has_many :line_items, dependent: :destroy

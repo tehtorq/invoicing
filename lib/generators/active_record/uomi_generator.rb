@@ -1,4 +1,4 @@
-module Invoicing
+module Uomi
   module Generators
     class InstallGenerator < Rails::Generators::Base
       include Rails::Generators::Migration
@@ -6,7 +6,7 @@ module Invoicing
       source_root File.expand_path("../templates", __FILE__)
 
       desc <<-CONTENT
-        Copies the invoicing migration file to the migrations
+        Copies the uomi migration file to the migrations
         folder.
         
         Please run rake db:migrate once the installer is 
@@ -23,7 +23,7 @@ module Invoicing
       end
 
       def create_migration_file
-        migration_template 'migration.rb', 'db/migrate/create_invoicing_tables.rb'
+        migration_template 'migration.rb', 'db/migrate/create_uomi_tables.rb'
       end
     end
   end

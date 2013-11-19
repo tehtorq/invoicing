@@ -1,6 +1,6 @@
 # implement this module and override behaviour on items which will be invoiced
 
-module Invoicing
+module Uomi
   module Invoiceable
   
     attr_accessor :invoiced, :invoice_id, :amount, :tax, :line_item_type_id

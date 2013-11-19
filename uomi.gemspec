@@ -1,14 +1,14 @@
 # -*- encoding: utf-8 -*-
 $:.push File.expand_path("../lib", __FILE__)
-require "invoicing/version"
+require "uomi/version"
 
 Gem::Specification.new do |s|
-  s.name        = "invoicing"
-  s.version     = Invoicing::VERSION
-  s.authors     = ["Douglas Anderson", "Jeffrey van Aswegen", ]
+  s.name        = "uomi"
+  s.version     = Uomi::VERSION
+  s.authors     = ["Douglas Anderson", "Jeffrey van Aswegen"]
   s.email       = ["i.am.douglas.anderson@gmail.com", "jeffmess@gmail.com"]
-  s.homepage    = ""
-  s.summary     = %q{ An invoicing gem. }
+  s.homepage    = 'https://github.com/tehtorq/uomi'
+  s.summary     = %q{ An uomi gem. }
   s.description = %q{ Manage invoices. }
 
   s.rubyforge_project = "uomi"

@@ -1,6 +1,6 @@
 # require 'spec_helper'
 # 
-# describe Invoicing::LatePayment do
+# describe Uomi::LatePayment do
 #   include Helpers
 #   
 #   before(:each) do

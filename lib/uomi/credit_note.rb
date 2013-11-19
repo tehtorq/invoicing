@@ -1,4 +1,4 @@
-module Invoicing
+module Uomi
   class CreditNote < Invoice
     alias_attribute :receipt_number, :invoice_number
 

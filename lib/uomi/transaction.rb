@@ -1,4 +1,4 @@
-module Invoicing
+module Uomi
   class Transaction < ActiveRecord::Base
     belongs_to :invoice
     

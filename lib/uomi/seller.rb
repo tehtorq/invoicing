@@ -1,4 +1,4 @@
-module Invoicing
+module Uomi
   class Seller < ActiveRecord::Base
     has_many :invoices
     belongs_to :sellerable, polymorphic: true

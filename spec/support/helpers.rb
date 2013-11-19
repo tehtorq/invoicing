@@ -1,11 +1,11 @@
 module Helpers
   def tear_it_down
-    Invoicing::Invoice.delete_all
-    Invoicing::LineItem.delete_all
-    Invoicing::Transaction.delete_all
-    Invoicing::LatePayment.delete_all
-    Invoicing::PaymentReference.delete_all
-    Invoicing::Seller.delete_all
+    Uomi::Invoice.delete_all
+    Uomi::LineItem.delete_all
+    Uomi::Transaction.delete_all
+    Uomi::LatePayment.delete_all
+    Uomi::PaymentReference.delete_all
+    Uomi::Seller.delete_all
   end
 end                                                                                                                                   
                                                                                                                                       
