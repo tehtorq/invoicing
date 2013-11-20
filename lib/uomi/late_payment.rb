@@ -1,7 +1,6 @@
 module Uomi
   class LatePayment < ActiveRecord::Base
     belongs_to :invoice
-  
     before_create :set_penalty_date
   
     def set_penalty_date

@@ -378,6 +378,7 @@ describe Uomi::Invoice do
   end
 
   context "Hooks" do
+  
     before(:each) do
       item_to_invoice = @invoice.extend(Uomi::Invoiceable)
       item_to_invoice.amount = 10
@@ -390,18 +391,21 @@ describe Uomi::Invoice do
     end
 
     context "issuing the invoice" do
-      it "the items to invoice should receive a mark invoice call" do
+
+      it "calls mark_invoiced on each invoiced item" do
         @item_to_invoice.should_receive(:mark_invoiced).with(@invoice2)
         @invoice2.issue!
       end
+
     end
 
     context "voiding the issued invoice" do
+
       before(:each) do
         @invoice2.issue!
       end
 
-      it "the items to invoice should receive a mark uninvoiced call" do
+      it "calls mark_uninvoiced on each invoiced item" do
         @item_to_invoice.should_receive(:mark_uninvoiced).with(@invoice2)
         @invoice2.void!
       end

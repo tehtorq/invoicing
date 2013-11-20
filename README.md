@@ -1,5 +1,5 @@
 
-[![Build Status](https://secure.travis-ci.org/tehtorq/uomi.png)](http://travis-ci.org/tehtorq/uomi)
+[![Build Status](https://secure.travis-ci.org/tehtorq/invoicing.png)](http://travis-ci.org/tehtorq/invoicing)
 
 Basic Usage
 
