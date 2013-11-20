@@ -1,11 +1,8 @@
 require 'spec_helper'
 
 describe Uomi::Invoice do
-  include Helpers
   
   before(:each) do
-    tear_it_down
-    
     @invoice = Uomi::generate_invoice do
       line_item description: "Line Item 1", amount: 1101, line_item_type_id: 1
       line_item description: "Line Item 2", amount: 5097, line_item_type_id: 1
@@ -76,10 +73,6 @@ describe Uomi::Invoice do
 
   context "searching for sets of invoices" do
 
-    before(:each) do
-      tear_it_down
-    end
-
     it "should find draft invoices" do
       issued_invoice = Uomi::generate_invoice do
         line_item description: "Line Item 1", amount: 1101, line_item_type_id: 1
@@ -91,8 +84,8 @@ describe Uomi::Invoice do
         line_item description: "Line Item 1", amount: 1101, line_item_type_id: 1, line_item_type_id: 1
       end
       
-      Uomi::Invoice.draft.count.should == 1
-      Uomi::Invoice.draft.first.should == draft_invoice
+      Uomi::Invoice.draft.count.should == 2
+      Uomi::Invoice.draft.last.should == draft_invoice
     end
 
     it "should find issued invoices" do

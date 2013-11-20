@@ -1,11 +1,8 @@
 require 'spec_helper'
 
 describe Uomi::InvoiceAdjustment do
-  include Helpers
   
   before(:each) do
-    tear_it_down
-
     buyer = Uomi::DebitTransaction.create!
     
     @invoice = Uomi::generate_invoice do

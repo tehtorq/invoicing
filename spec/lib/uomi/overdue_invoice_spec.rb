@@ -1,11 +1,6 @@
 require 'spec_helper'
 
 describe Uomi::OverdueInvoice do
-  include Helpers
-  
-  before(:each) do
-    tear_it_down
-  end
    
   it "should find all invoices which are overdue" do
     Uomi::generate_invoice do

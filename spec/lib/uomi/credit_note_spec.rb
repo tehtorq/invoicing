@@ -1,11 +1,8 @@
 require 'spec_helper'
 
 describe Uomi::CreditNote do
-  include Helpers
   
   before(:each) do
-    tear_it_down
-
     invoice_buyer = Uomi::DebitTransaction.create!
     invoice_seller = Uomi::DebitTransaction.create!
     
