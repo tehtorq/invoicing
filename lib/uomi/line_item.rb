@@ -4,7 +4,7 @@ module Uomi
     belongs_to :invoiceable, polymorphic: true
     belongs_to :line_item_type
 
-    validates :amount, numericality: {greater_than_or_equal_to: 0}, presence: true
+    validates :amount, numericality: true, presence: true
   
     def net_amount
       amount - tax
