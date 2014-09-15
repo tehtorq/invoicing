@@ -128,9 +128,53 @@ describe Uomi::CreditNote do
         @credit_note.balance.should == 7000
       end
 
-      # context "Applying credit note to an invoice" do
-      #   pending
-      # end
+      context "Applying credit note to multiple invoices" do
+        before(:each) do
+          @invoice1 = Uomi::generate_invoice do
+            line_item description: "Line Item 1", amount: 5000, line_item_type_id: 1
+          end
+          @invoice1.issue!
+
+          @invoice2 = Uomi::generate_invoice do
+            line_item description: "Line Item 1", amount: 2000, line_item_type_id: 1
+          end
+          @invoice2.issue!
+        end
+
+        context "Apply R50 credit to invoice 1" do
+          before(:each) do
+            inv = @invoice1
+
+            @credit_note.refund do
+              set_balance_off invoice: inv, amount: 5000
+            end
+
+            @credit_note.reload
+            @invoice1.reload
+          end
+
+          it "should settle the invoice" do
+            @invoice1.should be_settled
+          end
+
+          it "should set the balance on the credit note to 20" do
+            @credit_note.balance.should == 2000
+          end
+
+          it "should have created a debit transaction on the credit note to the value of 50.00" do
+            @credit_note.debit_transactions.last.amount.should == 5000
+          end
+
+          it "should have created a credit transaction against the invoice for 50.00" do
+            @invoice1.credit_transactions.last.amount.should == 5000
+          end
+
+          it "should know which invoice the credit note has transacted against" do
+            t = @credit_note.credit_note_credit_transactions.last
+            t.transaction.invoice.should == @invoice1
+          end
+        end
+      end
     end
 
     context "When applying credits to the invoiceables" do

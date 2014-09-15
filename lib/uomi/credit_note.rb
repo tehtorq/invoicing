@@ -15,8 +15,6 @@ module Uomi
     end
 
     def record_transaction_against_invoice!
-      #raise RuntimeError, "You must allocate a credit note against an invoice" if invoice.blank?
-      #raise RuntimeError, "You must allocate a credit note against an issued invoice" unless invoice.issued?
       invoice.add_credit_transaction(amount: total)
       invoice.save!
       CreditNoteCreditTransaction.create!(transaction: invoice.transactions.last, credit_note_id: self.id)
@@ -71,6 +69,26 @@ module Uomi
       end
 
       save!
+    end
+
+    # Refund section
+
+    def refund(&block)
+      instance_eval(&block)
+      save!
+    end
+
+    def set_balance_off(options={})
+      raise RuntimeError, "You must allocate this credit against an invoice" if options[:invoice].blank?
+      raise RuntimeError, "You must allocate this credit against a Uomi Invoice" unless options[:invoice].is_a?(Uomi::Invoice)
+      raise RuntimeError, "You cannot allocate nothing to the invoice" if (options[:amount].blank? || options[:amount].zero?)
+      invoice = options[:invoice]
+
+      invoice.add_credit_transaction(amount: options[:amount])
+      invoice.save!
+
+      self.add_debit_transaction(amount: options[:amount])
+      CreditNoteCreditTransaction.create!(transaction: invoice.transactions.last, credit_note_id: self.id)
     end
   end
 end
