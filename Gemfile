@@ -8,4 +8,5 @@ group :development do
   gem 'rspec-rails'
   gem 'sqlite3'
   gem 'database_cleaner', '>= 1.2.0'
+  gem 'andand'
 end

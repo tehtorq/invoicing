@@ -60,6 +60,8 @@ describe Uomi::CreditNote do
           against_invoice invoice
         end
 
+        @credit_note.issue!
+
         @invoice.reload
       end
 
@@ -100,9 +102,35 @@ describe Uomi::CreditNote do
       end
 
       it "should set the balance to 0 if applied against an invoice" do
+        @credit_note.balance.should == 0
+      end
+
+      it "should mark the credit note as settled" do
         @credit_note.should be_settled
       end
 
+    end
+
+    context "Ad Hoc Credit Note not applied to any invoices" do
+      before(:each) do
+        @credit_note = Uomi::generate_credit_note do
+          credit amount: 5000, description: 'Description'
+          credit amount: 2000, description: 'Another Description'
+        end
+        @credit_note.issue!
+      end
+
+      it "should generate a credit note to the value of 70.00" do
+        @credit_note.total.should == 7000
+      end
+
+      it "should have a balance of 70.00" do
+        @credit_note.balance.should == 7000
+      end
+
+      # context "Applying credit note to an invoice" do
+      #   pending
+      # end
     end
 
     context "When applying credits to the invoiceables" do
@@ -119,19 +147,6 @@ describe Uomi::CreditNote do
       end
 
     end
-
-    context "trying to create a standalone credit note" do
-
-      it "should raise an error if no invoice is specified" do
-        expect {Uomi::generate_credit_note do
-          line_items.each do |line_item|
-            credit amount: 500, description: "Credit note for Line Item #{line_item.id}", tax: 0
-          end
-          decorate_with tenant_name: "Peter"
-        end}.to raise_error(RuntimeError, "You must allocate a credit note against an invoice")
-      end
-    end
-
   end
   
 end

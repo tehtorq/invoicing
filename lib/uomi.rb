@@ -19,7 +19,7 @@ module Uomi
     credit_note = CreditNote.new
     credit_note.instance_eval(&block)
     credit_note.save!
-    credit_note.issue!
+    #credit_note.issue!
     credit_note
   end
   

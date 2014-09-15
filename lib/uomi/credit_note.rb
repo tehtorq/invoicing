@@ -9,15 +9,14 @@ module Uomi
     def issue(issued_at = Time.now)
       self.issued_at = issued_at
       create_initial_transaction!
-      record_transaction_against_invoice!
+      record_transaction_against_invoice! if self.invoice
       record_credit_notes!
       record_transaction!
     end
 
     def record_transaction_against_invoice!
-      raise RuntimeError, "You must allocate a credit note against an invoice" if invoice.blank?
-      raise RuntimeError, "You must allocate a credit note against an issued invoice" unless invoice.issued?
-
+      #raise RuntimeError, "You must allocate a credit note against an invoice" if invoice.blank?
+      #raise RuntimeError, "You must allocate a credit note against an issued invoice" unless invoice.issued?
       invoice.add_credit_transaction(amount: total)
       invoice.save!
       CreditNoteCreditTransaction.create!(transaction: invoice.transactions.last, credit_note_id: self.id)
@@ -25,10 +24,10 @@ module Uomi
 
     def credit(options={})
       add_line_item(
-        invoiceable: options[:line_item].invoiceable,
+        invoiceable: options[:line_item].andand.invoiceable,
         amount: options[:amount] || 0,
         tax: options[:tax] || 0,
-        description: options[:description] || "Credit note against #{options[:line_item].description}" #?
+        description: options[:description] || "Credit note against #{options[:line_item].andand.description}" #?
       )
     end
 
