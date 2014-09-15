@@ -79,7 +79,7 @@ describe Uomi::CreditNote do
       end
 
       it "should know if it is linked to an invoice" do
-        @credit_note.invoice.should == @invoice
+        @credit_note.invoices.should == [@invoice]
       end
 
       it "should be linked to the credit transaction paid against the invoice" do
@@ -153,6 +153,10 @@ describe Uomi::CreditNote do
             @invoice1.reload
           end
 
+          it "should set a credit note against an invoice" do
+            @invoice1.credit_notes.should == [@credit_note]
+          end
+
           it "should settle the invoice" do
             @invoice1.should be_settled
           end
@@ -184,6 +188,11 @@ describe Uomi::CreditNote do
 
               @credit_note.reload
               @invoice2.reload
+            end
+
+            it "should set a credit note against an invoice1 and invoice 2" do
+              @invoice1.credit_notes.should == [@credit_note]
+              @invoice2.credit_notes.should == [@credit_note]
             end
 
             it "should settle the invoice" do

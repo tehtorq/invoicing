@@ -2,19 +2,20 @@ module Uomi
   class CreditNote < Invoice
     alias_attribute :receipt_number, :invoice_number
 
-    has_one :credit_note_invoice, dependent: :destroy
-    has_one :invoice, through: :credit_note_invoice
+    has_many :credit_note_invoices, dependent: :destroy
+    has_many :invoices, through: :credit_note_invoices
     has_many :credit_note_credit_transactions, dependent: :destroy
 
     def issue(issued_at = Time.now)
       self.issued_at = issued_at
       create_initial_transaction!
-      record_transaction_against_invoice! if self.invoice
+      record_transaction_against_invoice! unless self.invoices.blank?
       record_credit_notes!
       record_transaction!
     end
 
     def record_transaction_against_invoice!
+      invoice = invoices.first
       validate(invoice: invoice, amount: self.total)
       invoice.add_credit_transaction(amount: total)
       invoice.save!
@@ -34,13 +35,13 @@ module Uomi
       raise RuntimeError, "You must allocate a credit note against an invoice" if invoice.blank?
       raise RuntimeError, "You must allocate a credit note against an issued invoice" unless invoice.issued?
       
-      self.credit_note_invoice = CreditNoteInvoice.new(invoice_id: invoice.id)
+      self.credit_note_invoices << CreditNoteInvoice.new(invoice_id: invoice.id)
       self.buyer = invoice.buyer
       self.seller = invoice.seller
     end
 
     def record_transaction!
-      if self.invoice
+      unless self.invoices.blank?
         add_debit_transaction(amount: total)
       end
     end
@@ -90,6 +91,7 @@ module Uomi
       invoice = options[:invoice]
 
       invoice.add_credit_transaction(amount: options[:amount])
+      against_invoice(invoice)
       invoice.save!
 
       self.add_debit_transaction(amount: options[:amount])
