@@ -9,18 +9,21 @@ module Uomi
   end
   
   def self.generate_invoice(&block)
-    invoice = Invoice.new
-    invoice.instance_eval(&block)
-    invoice.save!
-    invoice
+    ActiveRecord::Base.transaction do
+      invoice = Invoice.new
+      invoice.instance_eval(&block)
+      invoice.save!
+      invoice
+    end
   end
 
   def self.generate_credit_note(&block)
-    credit_note = CreditNote.new
-    credit_note.instance_eval(&block)
-    credit_note.save!
-    credit_note.issue!
-    credit_note
+    ActiveRecord::Base.transaction do
+      credit_note = CreditNote.new
+      credit_note.instance_eval(&block)
+      credit_note.save!
+      credit_note
+    end
   end
   
 end

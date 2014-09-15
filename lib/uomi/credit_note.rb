@@ -9,14 +9,13 @@ module Uomi
     def issue(issued_at = Time.now)
       self.issued_at = issued_at
       create_initial_transaction!
-      record_transaction_against_invoice!
+      record_transaction_against_invoice! if self.invoice
       record_credit_notes!
+      record_transaction!
     end
 
     def record_transaction_against_invoice!
-      raise RuntimeError, "You must allocate a credit note against an invoice" if invoice.blank?
-      raise RuntimeError, "You must allocate a credit note against an issued invoice" unless invoice.issued?
-
+      validate(invoice: invoice, amount: self.total)
       invoice.add_credit_transaction(amount: total)
       invoice.save!
       CreditNoteCreditTransaction.create!(transaction: invoice.transactions.last, credit_note_id: self.id)
@@ -24,10 +23,10 @@ module Uomi
 
     def credit(options={})
       add_line_item(
-        invoiceable: options[:line_item].invoiceable,
+        invoiceable: options[:line_item].andand.invoiceable,
         amount: options[:amount] || 0,
         tax: options[:tax] || 0,
-        description: options[:description] || "Credit note against #{options[:line_item].description}" #?
+        description: options[:description] || "Credit note against #{options[:line_item].andand.description}" #?
       )
     end
 
@@ -38,6 +37,12 @@ module Uomi
       self.credit_note_invoice = CreditNoteInvoice.new(invoice_id: invoice.id)
       self.buyer = invoice.buyer
       self.seller = invoice.seller
+    end
+
+    def record_transaction!
+      if self.invoice
+        add_debit_transaction(amount: total)
+      end
     end
 
     def record_credit_notes!
@@ -65,6 +70,30 @@ module Uomi
       end
 
       save!
+    end
+
+    def validate(options={})
+      raise RuntimeError, "You must allocate this credit against an invoice" if options[:invoice].blank?
+      raise RuntimeError, "You must allocate this credit against a Uomi Invoice" unless options[:invoice].is_a?(Uomi::Invoice)
+      raise RuntimeError, "You cannot allocate nothing to the invoice" if (options[:amount].blank? || options[:amount].zero?)
+    end
+
+    # Refund section
+
+    def refund(&block)
+      instance_eval(&block)
+      save!
+    end
+
+    def set_balance_off(options={})
+      validate(options)
+      invoice = options[:invoice]
+
+      invoice.add_credit_transaction(amount: options[:amount])
+      invoice.save!
+
+      self.add_debit_transaction(amount: options[:amount])
+      CreditNoteCreditTransaction.create!(transaction: invoice.transactions.last, credit_note_id: self.id)
     end
   end
 end

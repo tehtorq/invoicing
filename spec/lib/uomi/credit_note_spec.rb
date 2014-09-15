@@ -60,11 +60,9 @@ describe Uomi::CreditNote do
           against_invoice invoice
         end
 
-        @invoice.reload
-      end
+        @credit_note.issue!
 
-      it "should be issued" do
-        @credit_note.should be_issued
+        @invoice.reload
       end
 
       it "should have a receipt number" do
@@ -103,6 +101,115 @@ describe Uomi::CreditNote do
         @credit_note.seller.sellerable.should == @invoice_seller
       end
 
+      it "should set the balance to 0 if applied against an invoice" do
+        @credit_note.balance.should == 0
+      end
+
+      it "should mark the credit note as settled" do
+        @credit_note.should be_settled
+      end
+
+    end
+
+    context "Ad Hoc Credit Note not applied to any invoices" do
+      before(:each) do
+        @credit_note = Uomi::generate_credit_note do
+          credit amount: 5000, description: 'Description'
+          credit amount: 2000, description: 'Another Description'
+        end
+        @credit_note.issue!
+      end
+
+      it "should generate a credit note to the value of 70.00" do
+        @credit_note.total.should == 7000
+      end
+
+      it "should have a balance of 70.00" do
+        @credit_note.balance.should == 7000
+      end
+
+      context "Applying credit note to multiple invoices" do
+        before(:each) do
+          @invoice1 = Uomi::generate_invoice do
+            line_item description: "Line Item 1", amount: 5000, line_item_type_id: 1
+          end
+          @invoice1.issue!
+
+          @invoice2 = Uomi::generate_invoice do
+            line_item description: "Line Item 1", amount: 2000, line_item_type_id: 1
+          end
+          @invoice2.issue!
+        end
+
+        context "Apply credit to invoice 1 and 2" do
+          before(:each) do
+            inv = @invoice1
+
+            @credit_note.refund do
+              set_balance_off invoice: inv, amount: 5000
+            end
+
+            @credit_note.reload
+            @invoice1.reload
+          end
+
+          it "should settle the invoice" do
+            @invoice1.should be_settled
+          end
+
+          it "should set the balance on the credit note to 20" do
+            @credit_note.balance.should == 2000
+          end
+
+          it "should have created a debit transaction on the credit note to the value of 50.00" do
+            @credit_note.debit_transactions.last.amount.should == 5000
+          end
+
+          it "should have created a credit transaction against the invoice for 50.00" do
+            @invoice1.credit_transactions.last.amount.should == 5000
+          end
+
+          it "should know which invoice the credit note has transacted against" do
+            t = @credit_note.credit_note_credit_transactions.last
+            t.transaction.invoice.should == @invoice1
+          end
+
+          context "apply 20-00 to invoice 2" do
+            before(:each) do
+              inv = @invoice2
+
+              @credit_note.refund do
+                set_balance_off invoice: inv, amount: 2000
+              end
+
+              @credit_note.reload
+              @invoice2.reload
+            end
+
+            it "should settle the invoice" do
+              @invoice2.should be_settled
+            end
+
+            it "should settle the credit note" do
+              @credit_note.balance.should == 0
+              @credit_note.should be_settled
+            end
+
+            it "should have created a debit transaction on the credit note to the value of 50.00" do
+              @credit_note.debit_transactions.last.amount.should == 2000
+            end
+
+            it "should have created a credit transaction against the invoice for 50.00" do
+              @invoice2.credit_transactions.last.amount.should == 2000
+            end
+
+            it "should know which invoice the credit note has transacted against" do
+              t = @credit_note.credit_note_credit_transactions.last
+              t.transaction.invoice.should == @invoice2
+            end
+          end
+        end
+      end
     end
 
     context "When applying credits to the invoiceables" do
@@ -119,19 +226,6 @@ describe Uomi::CreditNote do
       end
 
     end
-
-    context "trying to create a standalone credit note" do
-
-      it "should raise an error if no invoice is specified" do
-        expect {Uomi::generate_credit_note do
-          line_items.each do |line_item|
-            credit amount: 500, description: "Credit note for Line Item #{line_item.id}", tax: 0
-          end
-          decorate_with tenant_name: "Peter"
-        end}.to raise_error(RuntimeError, "You must allocate a credit note against an invoice")
-      end
-    end
-
   end
   
 end
