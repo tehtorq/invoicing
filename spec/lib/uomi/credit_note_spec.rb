@@ -63,10 +63,6 @@ describe Uomi::CreditNote do
         @invoice.reload
       end
 
-      it "should be issued" do
-        @credit_note.should be_issued
-      end
-
       it "should have a receipt number" do
         @credit_note.receipt_number.should == "CN#{@credit_note.id}"
       end
@@ -101,6 +97,10 @@ describe Uomi::CreditNote do
 
       it "should set the seller to the invoice's seller" do
         @credit_note.seller.sellerable.should == @invoice_seller
+      end
+
+      it "should set the balance to 0 if applied against an invoice" do
+        @credit_note.should be_settled
       end
 
     end

@@ -11,6 +11,7 @@ module Uomi
       create_initial_transaction!
       record_transaction_against_invoice!
       record_credit_notes!
+      record_transaction!
     end
 
     def record_transaction_against_invoice!
@@ -38,6 +39,12 @@ module Uomi
       self.credit_note_invoice = CreditNoteInvoice.new(invoice_id: invoice.id)
       self.buyer = invoice.buyer
       self.seller = invoice.seller
+    end
+
+    def record_transaction!
+      if self.invoice
+        add_debit_transaction(amount: total)
+      end
     end
 
     def record_credit_notes!
