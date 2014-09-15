@@ -4,8 +4,8 @@ source "http://rubygems.org"
 gemspec
 
 group :development do
-  gem 'rspec'
-  gem 'rspec-rails'
+  gem 'rspec', '2.8.0'
+  gem 'rspec-rails', '2.8.1'
   gem 'sqlite3'
   gem 'database_cleaner', '>= 1.2.0'
   gem 'andand'
