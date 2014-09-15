@@ -141,7 +141,7 @@ describe Uomi::CreditNote do
           @invoice2.issue!
         end
 
-        context "Apply R50 credit to invoice 1" do
+        context "Apply credit to invoice 1 and 2" do
           before(:each) do
             inv = @invoice1
 
@@ -172,6 +172,41 @@ describe Uomi::CreditNote do
           it "should know which invoice the credit note has transacted against" do
             t = @credit_note.credit_note_credit_transactions.last
             t.transaction.invoice.should == @invoice1
+          end
+
+          context "apply 20-00 to invoice 2" do
+            before(:each) do
+              inv = @invoice2
+
+              @credit_note.refund do
+                set_balance_off invoice: inv, amount: 2000
+              end
+
+              @credit_note.reload
+              @invoice2.reload
+            end
+
+            it "should settle the invoice" do
+              @invoice2.should be_settled
+            end
+
+            it "should settle the credit note" do
+              @credit_note.balance.should == 0
+              @credit_note.should be_settled
+            end
+
+            it "should have created a debit transaction on the credit note to the value of 50.00" do
+              @credit_note.debit_transactions.last.amount.should == 2000
+            end
+
+            it "should have created a credit transaction against the invoice for 50.00" do
+              @invoice2.credit_transactions.last.amount.should == 2000
+            end
+
+            it "should know which invoice the credit note has transacted against" do
+              t = @credit_note.credit_note_credit_transactions.last
+              t.transaction.invoice.should == @invoice2
+            end
           end
         end
       end
