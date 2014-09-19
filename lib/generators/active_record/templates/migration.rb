@@ -20,12 +20,16 @@ class CreateUomiTables < ActiveRecord::Migration
       t.timestamps
     end
 
+    add_index(:uomi_line_items, :invoice_id)
+
     create_table "uomi_transactions", :force => true do |t|
       t.integer "invoice_id"
       t.string  "type"
       t.integer "amount"
       t.timestamps
     end
+
+    add_index(:uomi_transactions, :invoice_id)
 
     create_table "uomi_invoices", :force => true do |t|
       t.integer  "seller_id"
@@ -46,6 +50,8 @@ class CreateUomiTables < ActiveRecord::Migration
       t.string "reference"
       t.timestamps
     end
+
+    add_index(:uomi_payment_references, :invoice_id)
     
     create_table "uomi_sellers", :force => true do |t|
       t.integer "sellerable_id"
@@ -64,6 +70,8 @@ class CreateUomiTables < ActiveRecord::Migration
       t.text "data"
       t.timestamps
     end
+
+    add_index(:uomi_invoice_decorators, :invoice_id)
 
     create_table "uomi_credit_note_invoices", :force => true do |t|
       t.integer "invoice_id"
