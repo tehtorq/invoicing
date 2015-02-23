@@ -27,7 +27,10 @@ module Uomi
         event :void, transitions_to: :voided
       end
 
-      state :settled
+      state :settled do
+        event :unsettle, transitions_to: :issued
+      end
+
       state :voided
     end
 
@@ -102,8 +105,10 @@ module Uomi
     end
       
     def calculate_balance
-      self.balance = (0 - debit_transactions.sum(&:amount)) + credit_transactions.sum(&:amount)
+      bal = (0 - debit_transactions.sum(&:amount)) + credit_transactions.sum(&:amount)
+      self.balance = bal
       settle! if should_settle?
+      unsettle! if (bal < 0 && settled?)
     end
 
     def should_settle?
