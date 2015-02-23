@@ -6,6 +6,24 @@ module Uomi
     has_many :invoices, through: :credit_note_invoices
     has_many :credit_note_credit_transactions, dependent: :destroy
 
+    workflow do
+      state :draft do
+        event :issue, transitions_to: :issued
+        event :void, transitions_to: :voided
+      end
+      
+      state :issued do
+        event :settle, transitions_to: :settled
+        event :void, transitions_to: :voided
+      end
+
+      state :settled do
+        event :void, transitions_to: :voided
+      end
+
+      state :voided
+    end
+
     def issue(issued_at = Time.now)
       self.issued_at = issued_at
       create_initial_transaction!
@@ -96,6 +114,20 @@ module Uomi
 
       self.add_debit_transaction(amount: options[:amount])
       CreditNoteCreditTransaction.create!(transaction: invoice.transactions.last, credit_note_id: self.id)
+    end
+
+    def void
+      annul_remaining_amount! unless self.draft?
+      reverse_transactions_against_invoice
+      self
+    end
+
+    def reverse_transactions_against_invoice
+      credit_note_credit_transactions.each do |cnct|
+        invoice = cnct.transaction.invoice
+        invoice.add_debit_transaction(amount: cnct.transaction.amount)
+        invoice.save!
+      end
     end
   end
 end

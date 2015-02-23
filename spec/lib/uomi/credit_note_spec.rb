@@ -216,6 +216,32 @@ describe Uomi::CreditNote do
               t = @credit_note.credit_note_credit_transactions.last
               t.transaction.invoice.should == @invoice2
             end
+
+            context "Void the credit note" do
+              before(:each) do
+                @credit_note.void!
+                @credit_note.reload
+                @invoice1.reload
+                @invoice2.reload
+              end
+
+              it "Credit note should be voided" do
+                @credit_note.should be_voided
+              end
+
+              it "Invoice 1 should not be settled" do
+                @invoice1.should_not be_settled
+              end
+
+              it "invoice 2 should not be settled" do
+                @invoice2.should_not be_settled
+              end
+
+              it "should still keep the links between credit notes and invoices for history" do
+                @invoice1.credit_notes.should == [@credit_note]
+                @invoice2.credit_notes.should == [@credit_note]
+              end
+            end
           end
         end
       end
