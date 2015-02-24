@@ -178,6 +178,22 @@ describe Uomi::CreditNote do
             t.transaction.invoice.should == @invoice1
           end
 
+          context "Void the credit note" do
+            before(:each) do
+              @credit_note.void!
+              @credit_note.reload
+              @invoice1.reload
+            end
+
+            it "Credit note should be voided" do
+              @credit_note.should be_voided
+            end
+
+            it "Credit note balance should be zero" do
+              @credit_note.balance.should be_zero
+            end
+          end
+
           context "apply 20-00 to invoice 2" do
             before(:each) do
               inv = @invoice2
@@ -227,6 +243,10 @@ describe Uomi::CreditNote do
 
               it "Credit note should be voided" do
                 @credit_note.should be_voided
+              end
+
+              it "Credit note balance should be zero" do
+                @credit_note.balance.should be_zero
               end
 
               it "Invoice 1 should not be settled" do

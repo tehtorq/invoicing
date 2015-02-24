@@ -116,6 +116,10 @@ module Uomi
       CreditNoteCreditTransaction.create!(transaction: invoice.transactions.last, credit_note_id: self.id)
     end
 
+    def annul_remaining_amount!
+      add_debit_transaction amount: balance.abs
+    end
+
     def void
       annul_remaining_amount! unless self.draft?
       reverse_transactions_against_invoice
